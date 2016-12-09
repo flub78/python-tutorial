@@ -24,40 +24,6 @@ print board
 for row in board:
 	print row
 
-
-# playing with hashes	
-hash = {}
-hash["key"] = "DEAFDBEEF"
-hash["name"] = "John Doe"
-
-print "Hello", hash["name"]
-
-# utilisation des tuples comme clé
-board = {}
-board['a', 1] = "tour blanche"
-
-placard = {"chemise" : 3, "chaussures" : 4}
-print "placard = ", placard
-del placard['chemise']
-print "placard = ", placard
-
-# playing with sets
-autoreferenced = {"elt1", "elt2"}
-set2 = {"elt1", "elt3"}
-set2.add("elt4")
-set2 |= {"elt5", "elt6"}
-
-print "autoreferenced = ", autoreferenced
-# forbidden
-# autoreferenced.add(autoreferenced) 
-
-set3 = autoreferenced.union(set2)
-set3.remove("elt5")
-print "set3 =", set3
-
-intersection = autoreferenced.intersection(set2)
-print "intersection = ", intersection
-
 # -------------------------------------------------------------------------------------------
 s = "Good morning America"
 print s
