@@ -29,6 +29,9 @@ class Person:
     def __del__(self):
         """ Destructor """
         print "destructor:", vars(self)
+        
+    def __repr__(self):
+        return ("Person => name: {}, firstname: {}, age: {}".format(self._name, self._firstname, self._age))
 
 p = Person('Doe', age = 25)
 
@@ -54,6 +57,9 @@ except Exception as e:
     print "Exception raised: ", e
     
 print "dir(p) = ", dir(p)
+print p
+
+print str(p)
 
 
 print "bye"
