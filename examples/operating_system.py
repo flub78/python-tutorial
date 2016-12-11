@@ -11,5 +11,7 @@ print dir_path
 cwd = os.getcwd()
 print cwd 
 
+print os.system('ftp -h')
+
 print "bye"
 
