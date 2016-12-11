@@ -10,6 +10,7 @@ r + 2
 r + 3
 print r
 
+# Stange no iterator defined and it works ....
 for elt in r:
     print elt
 
