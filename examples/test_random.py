@@ -12,20 +12,20 @@ execution:
 
 import random
 import unittest
-from posix import lstat
 
 class RandomTest(unittest.TestCase):
     """ Test case for random """
     
     def test_choice(self):
-        """ given: a list
-            when: selecting a random elt
-            then: it belongs ot the list
+        """ 
+        given: a list
+        when: selecting a random elt
+        then: it belongs ot the list
         """
         lst = list(range(10))
-        print lst
+        # print lst
         elt = random.choice(lst)
-        print "random elt = ", elt
+        # print "random elt = ", elt
         self.assertIn(elt, lst)
         self.assertFalse(elt % 4 == 0, "True quite often")
         
@@ -39,11 +39,11 @@ class RandomTest(unittest.TestCase):
         lst = list(range(10))
         shuffled = list(lst) # deep copy
         random.shuffle(shuffled)
-        print "lst =", lst
-        print "shuffled= ", shuffled
+        # print "lst =", lst
+        # print "shuffled= ", shuffled
         sorted = list(shuffled)
         sorted.sort()
-        print "sorted = ", sorted
+        # print "sorted = ", sorted
         same_order = True
         i = 0
         while i < 10:

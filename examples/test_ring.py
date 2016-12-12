@@ -1,7 +1,18 @@
 #!/usr/bin/python
 # -*- coding:utf8 -*
 
+"""
+Unit tests for the Ring module
+
+execution:
+    python test_ring.py
+    or
+    python -m unittest discover
+"""
+
+
 from ring import *
+import unittest
 
 r = Ring(4)
 
@@ -14,7 +25,8 @@ print r
 for elt in r:
     print elt
 
-print "bye"
 
+if __name__ == '__main__':        
+    unittest.main()
 
 
