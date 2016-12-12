@@ -1,7 +1,8 @@
 #!/usr/bin/python
 # -*- coding:utf8 -*
-#
-# Use files to save and restore objects
+
+""" Use files to save and restore objects """
+
 import pickle
 import os
 
