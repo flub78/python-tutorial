@@ -21,10 +21,17 @@ class Person:
         Person.nb += 1
         
     def familly_name(self):
+        """ name accessor """
         return self._name
     
     def age(self):
+        """ age accessor """
         return self._age
+    
+    def count(selfcls):
+        """ a class method """
+        return Person.nb
+    count = classmethod(count)
     
     def __del__(self):
         """ Destructor """
@@ -39,7 +46,7 @@ p2 = Person("Smith")
 
 p = Person('Dalton', age = 60)
 
-print "We have ", Person.nb, " persons"
+print "We have created ", Person.count(), " persons"
 
 # direct access to attributes
 print "p.name = ", p._name
