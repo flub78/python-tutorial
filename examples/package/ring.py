@@ -18,6 +18,9 @@ class Ring:
 		return len(self._buffer)
 	
 	def __getitem__(self, i):
+		""" access to element at index i
+		note that providing __getitem__ generates a default iterator
+		"""
 		return self._buffer[i]
 	
 	def __setitem__(self, i, v):
@@ -34,10 +37,31 @@ class Ring:
 			
 	def __contains__(self, v):
 		return v in self._buffer
+	
+	def __iter__(self):
+		""" returns an iterator on the ring
+		note that providing this method disables the default iterator 
+		"""
+		return RingIterator(self)
 		
-# unit tests
+class RingIterator:
 
+	def __init__(self, ring):
+		""" Constructor """
+		self._i = 0
+		self._ring = ring
+		
+	def next(self):
+		i = self._i
+		self._i += 1
+		if (self._i > len(self._ring)):
+			raise StopIteration
+		return self._ring[i]
+	
+	
+# basic unit tests
 if __name__ == "__main__":
+	""" Some basic tests, """
 	t = Ring(3)
 	# assert(t)
 	t.append(1)
