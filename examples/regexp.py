@@ -4,19 +4,22 @@ import re
 
 print "Regular expressions"
 
-if re.search(r'abc', 'abcdef'):
-    print "match"
+reg = r'abc'
+if re.search(reg, 'abcdef'):
+    print "match abc"
 
-if re.match(r'abc*', 'abcccdef'):
-    print "match"
-    print r'\1'
+reg = r'abc*'
+if re.match(reg, 'abcccdef'):
+    print "match abc*"
+    print r"\1"
     
-r = re.search(r'abc+', 'abdef')   
+reg = r'abc+'    
+r = re.search(reg, 'abdef')   
 print r
 if (r):
     print "match"    
 else:
-    print "no match"
+    print "no match abc+"
 print "bye"
 
 
