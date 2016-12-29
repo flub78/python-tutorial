@@ -1,7 +1,10 @@
 #!/usr/bin/python
 # -*- coding:utf8 -*
 
+s1 = "Hello "
+s2 = "Frédéric\n"
 s = "Hello Frédéric!\n"
+assert (s == s1 + s2, "string concatenation")
 
 print s
 print s.lower()
