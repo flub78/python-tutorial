@@ -1,6 +1,13 @@
 eclipse.preferences.version=1
+encoding//examples/basic_arithmetic.py=utf8
+encoding//examples/basic_types.py=utf8
+encoding//examples/binfiles.py=utf8
 encoding//examples/client.py=utf-8
 encoding//examples/client2.py=utf-8
+encoding//examples/decorators.py=utf8
+encoding//examples/dict.py=utf8
 encoding//examples/echo.py=utf-8
+encoding//examples/hello.py=utf8
+encoding//examples/lists.py=utf8
 encoding//examples/server.py=utf-8
 encoding//examples/server2.py=utf-8
