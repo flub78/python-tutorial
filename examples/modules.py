@@ -13,8 +13,8 @@ import math
 from math import fabs
 from math import *
 
-print math.sqrt(16)
-print fabs(-5)
+print (math.sqrt(16))
+print (fabs(-5))
 
-print "bye"
+print ("bye")
 

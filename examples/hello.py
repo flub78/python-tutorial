@@ -1,6 +1,8 @@
 #!/usr/bin/python
 # -*- coding:utf8 -*
 
-print "Hello Frédéric!\n"
-print "bye"
+import this
+
+print ("Hello Frédéric!\n")
+print ("bye")
 

@@ -11,8 +11,8 @@ def fact(n):
 	else:
 		return n * fact(n - 1)
 
-nb = input("type an integer: ")
-print "fact(" + str(nb) + ") = " + str((fact(nb)))
+nb = int(input("type an integer: "))
+print ("fact(" + str(nb) + ") = " + str((fact(nb))))
 
 help(fact)
 

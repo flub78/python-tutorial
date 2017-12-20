@@ -14,4 +14,4 @@ r = s.recv(9999999)
 # with open(file_name,'wb') as _file:
 #    _file.write(r)
 print("Le fichier %s." % file_name)
-print r
+print (r)

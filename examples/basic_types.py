@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding:utf8 -*
 
-print "Experimentation on python basic types!\n"
+print ("Experimentation on python basic types!\n")
 
 age = 42
 age += 2
@@ -14,12 +14,12 @@ multi_str = """Hello
     I am leaving.
     Bye"""
 
-print "str = " + a_str 
-print "multi_str = " + multi_str 
+print ("str = " + a_str) 
+print ("multi_str = " + multi_str) 
 
-print "age = ", age
+print ("age = ", age)
 
-print "pi = ", pi
+print ("pi = ", pi)
 
-print "bye"
+print ("bye")
 

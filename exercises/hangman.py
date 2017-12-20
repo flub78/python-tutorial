@@ -9,10 +9,28 @@
   * score = remaining attempts to guess the word (out of 8)
   * computes and record player score
   
+@startuml
+
+[*] --> AskName
+AskName --> [*]
+
+AskName : What is your name?
+
+AskName -> Game : name
+Game --> [*]
+
+Game --> Attempts : start
+Attempts --> Game : 8th
+Attempts --> Attempts : letter
+Attempts --> [*]
+
+@enduml
+
 """
 
 # Python libraries
 from random import randrange
+from enum import Enum
 
 # Project libraries
 # first form gives access and requires fully specified names 
@@ -38,6 +56,42 @@ print "words out of order"
 for x in range(0, nb):
     rd = randrange(0, nb)
     print "\t-> ", words[x], " : ", rd, words[rd]
+
+def help():
+    """ Lists supported commands """
+
+    hlp = """Small command interpretor
+    command:
+        help : print this
+        quit : exit the interpretor
+    """
+    print hlp
+
+class States(Enum):
+    ASK_NAME = 1
+    GAME = 2
+    ATTEMPTS = 3
+    
+def interpretor():
+    """ The interpretor event loop """
+    
+    state = States.ASK_NAME
+    
+    try:
+        while True:
+            line = raw_input(">: ")
+            print line
+            if (line == "quit"):
+                break
+            elif (line == "help"):
+                help()
+            state = States.GAME
+            state = States.UNKNOW
+            
+    except:
+        all
+    
+interpretor()
 
 print "bye"
 

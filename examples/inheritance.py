@@ -1,7 +1,7 @@
 #!/usr/bin/python
-# -*- coding:utf8 -*
+# -*- coding:utf-8 -*
 
-print "First objects"
+print ("First objects")
 
 class Person:
     """
@@ -27,7 +27,7 @@ class Person:
     
     def __del__(self):
         """ Destructor """
-        print "destructor:", vars(self)
+        print ("destructor:", vars(self))
         
     def __repr__(self):
         return ("Person => name: {}, firstname: {}, age: {}".format(self._name, self._firstname, self._age))
@@ -41,15 +41,14 @@ class Agent(Person):
     def id(self):
         return self._id
         
-p = Agent('Bond', 007, 'James', age = 40)
-
-print "We have ", Person.nb, " persons"
+p = Agent ('Bond', 'James', age = 40)
+print ("We have ", Person.nb, " persons")
 
 # to dump all attributes
-print vars(p)
+print (vars(p))
 
 assert(issubclass(Agent, Person))
 assert(isinstance(p, (Agent, Person)))
 
-print "bye"
+print ("bye")
 
