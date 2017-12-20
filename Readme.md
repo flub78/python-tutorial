@@ -10,7 +10,23 @@ There are:
 
 ## Run a program
 
+### Under Eclipse
+
+1. open, select the program
+1. run as python script	
+
 ## Run a unit test
 
 * A single test
 * A test suite
+
+### Under eclipse
+
+1. Select the unit test, or the test suite
+2. run as python unit-test
+
+## Generate python doc using pydoc
+
+???
+
+

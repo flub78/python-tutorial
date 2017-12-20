@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- coding:utf8 -*
+# -*- coding:utf-8 -*
 
 import random
 import sys
@@ -39,5 +39,5 @@ thread_2.start()
 # Attend que les threads se terminent
 thread_1.join()
 thread_2.join()           
-print "\nbye"
+print ("\nbye")
 

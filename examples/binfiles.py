@@ -6,7 +6,7 @@
 import pickle
 import os
 
-print "Binary files!\n"
+print ("Binary files!\n")
 
 score = {
   "joueur 1":    5,
@@ -35,5 +35,5 @@ os.unlink(filename)
 
 assert(not os.path.isfile(filename))    
 
-print "bye"
+print ("bye")
 

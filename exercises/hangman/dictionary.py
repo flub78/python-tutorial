@@ -4,7 +4,7 @@
 """ Dictionary
 """
 
-print "hangman.dictionary"
+print ("hangman.dictionary")
 
 words = [
     "anchor",

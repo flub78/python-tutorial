@@ -6,3 +6,11 @@ ERROR:root:Logging of an error on default logger
 DEBUG:root:This message should go to the log file
 INFO:root:So should this
 WARNING:root:And this, too
+ERROR:root:Logging of an error on default logger
+DEBUG:root:This message should go to the log file
+INFO:root:So should this
+WARNING:root:And this, too
+ERROR:root:Logging of an error on default logger
+DEBUG:root:This message should go to the log file
+INFO:root:So should this
+WARNING:root:And this, too

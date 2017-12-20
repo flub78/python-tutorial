@@ -1,7 +1,7 @@
 #!/usr/bin/python
-# -*- coding:utf8 -*
+# -*- coding:utf-8 -*
 
-print "Object management"
+print ("Object management")
 
 class Whiteboard:
     """
@@ -22,7 +22,7 @@ class Whiteboard:
         self._surface = ""
         
     def _get_surface(self):
-        print "======> private"
+        print ("======> private")
         # raise Exception ("Private attribute")
 
     # properties can be used to create special attributes
@@ -34,13 +34,13 @@ class Whiteboard:
 classroom = Whiteboard()
 classroom.write("Hello")
 classroom.write("World")
-print classroom.display()
+print (classroom.display())
 
 classroom.erase()
 classroom.write("Hello World")
-print classroom.display()
+print (classroom.display())
 
-print classroom._display
+print (classroom._display)
 
-print "bye"
+print ("bye")
 

@@ -3,15 +3,15 @@
 
 import os
 
-print "os\n"
+print ("os\n")
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
-print dir_path
+print (dir_path)
 
 cwd = os.getcwd()
-print cwd 
+print (cwd) 
 
-print os.system('ftp -h')
+print (os.system('ftp -h'))
 
-print "bye"
+print ("bye")
 

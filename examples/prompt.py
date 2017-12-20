@@ -4,27 +4,29 @@
 #
 # TODO: manage the cursor 
 
-"""
-	Lists supported commands
-"""
 def help():
+	""" Lists supported commands """
+
 	hlp = """Small command interpretor
 	command:
 		help : print this
 		quit : exit the interpretor
 	"""
-	print hlp
+	print (hlp)
+
+def interpretor():
+	""" The interpretor event loop """
+	try:
+		while True:
+			line = raw_input(">: ")
+			print (line)
+			if (line == "quit"):
+				break
+			elif (line == "help"):
+				help()
+	except:
+		all
 	
-try:
-	while True:
-		line = raw_input(">: ")
-		print line
-		if (line == "quit"):
-			break
-		elif (line == "help"):
-			help()
-except:
-	all
-	
-print "bye"
+interpretor()
+print ("bye")
 

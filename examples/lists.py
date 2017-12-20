@@ -1,6 +1,6 @@
 #!/usr/bin/python
-# -*- coding:utf8 -*
-print "Lists\n"
+# -*- coding:utf-8 -*
+print ("Lists\n")
 
 mylist = [1, 2]
 mylist.append(3)
@@ -8,11 +8,11 @@ mylist = mylist + [4, 5]
 mylist.remove(4)
 del mylist [0]
 for elt in mylist:
-	print elt
-print "mylist = ", mylist
+	print (elt)
+print ("mylist = ", mylist)
 	
 for i, elt in enumerate(mylist):
-	print "tab[", i, "] = ", elt
+	print ("tab[", i, "] = ", elt)
 
 board = [
   ['.', 'O', 'X'],
@@ -20,32 +20,32 @@ board = [
   ['O', 'X', 'O'],
 ]
 
-print board
+print (board)
 for row in board:
-	print row
+	print (row)
 
 # -------------------------------------------------------------------------------------------
 s = "Good morning America"
-print s
+print (s)
 l = s.split()
-print l
+print (l)
 s2 = "-".join(l)
-print s2
+print (s2)
 
 def multi_params(*params):
-	print "multi_params"
+	print ("multi_params")
 	for elt in params:
-		print elt
+		print (elt)
 		
 multi_params(1, 2, 3, 4)
 multi_params(*l)
 
 liste_origine = [0, 1, 2, 3, 4, 5]
 squares = [nb * nb for nb in liste_origine]
-print squares
+print (squares)
 
 liste_origine = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-print [nb for nb in liste_origine if nb % 2 == 0]
+print ([nb for nb in liste_origine if nb % 2 == 0])
 
 
 inventaire = [
@@ -56,5 +56,5 @@ inventaire = [
 ("prunes", 51) ]
 
 
-print "bye"
+print ("bye")
 

@@ -9,5 +9,5 @@ fonc(4)
 fonc(b=8, d=5)
 fonc(b=35, c=48, a=4, e=9)
 
-print "bye"
+print ("bye")
 

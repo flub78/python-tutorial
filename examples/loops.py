@@ -5,7 +5,7 @@
 def mult(nb):
 	i = 1
 	while (i <= 10):
-		print str(nb), " * ", str(i), " = ", str(i * nb)
+		print (str(nb), " * ", str(i), " = ", str(i * nb))
 		i += 1
 		
 mult(3)
@@ -22,7 +22,7 @@ for lettre in chaine:
         res += lettre
     else: # lettre est une consonne... ou plus exactement, lettre n'est pas une voyelle
         res += '*'
-print res
+print (res)
 
 i = 1
 while i < 20: # Tant que i est inférieure à 20

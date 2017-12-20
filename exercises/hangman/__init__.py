@@ -1,1 +1,3 @@
-print "\nInitialization of the package: hangman"
+
+       
+       

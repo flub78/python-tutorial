@@ -6,7 +6,7 @@
 
 import logging
 
-print "Experiment on logging"
+print ("Experiment on logging")
 
 logger = logging.getLogger("memory access")
 logger.info("System has 2Gb of memory")
@@ -25,5 +25,5 @@ logging.debug('This message should go to the log file')
 logging.info('So should this')
 logging.warning('And this, too')
 
-print "bye"
+print ("bye")
 

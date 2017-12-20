@@ -1,12 +1,12 @@
 #!/usr/bin/python
 # -*- coding:utf8 -*
 
-print "Files!\n"
+print ("Files!\n")
 
 fd = open('files.py', 'r')
 
-print fd
-print type(fd)
+print (fd)
+print (type(fd))
 
 txt = fd.read()
 
@@ -20,5 +20,5 @@ with open('files.py', 'r') as fd:
     
 assert (txt == txt2)
 
-print "bye"
+print ("bye")
 

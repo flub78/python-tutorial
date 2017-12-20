@@ -1,7 +1,7 @@
 #!/usr/bin/python
-# -*- coding:utf8 -*
+# -*- coding:utf-8 -*
 
-print "First objects"
+print ("First objects")
 
 class Person:
     """
@@ -28,14 +28,14 @@ class Person:
         """ age accessor """
         return self._age
     
-    def count(selfcls):
+    def count(self):
         """ a class method """
         return Person.nb
     count = classmethod(count)
     
     def __del__(self):
         """ Destructor """
-        print "destructor:", vars(self)
+        print ("destructor:", vars(self))
         
     def __repr__(self):
         return ("Person => name: {}, firstname: {}, age: {}".format(self._name, self._firstname, self._age))
@@ -46,28 +46,28 @@ p2 = Person("Smith")
 
 p = Person('Dalton', age = 60)
 
-print "We have created ", Person.count(), " persons"
+print ("We have created ", Person.count(), " persons")
 
 # direct access to attributes
-print "p.name = ", p._name
+print ("p.name = ", p._name)
 
 # to dump all attributes
-print vars(p)
+print (vars(p))
 
-print p.familly_name(), p.age()
+print (p.familly_name(), p.age())
 
 # but no accessor per default
 try:
     # print p.name()
     pass
 except Exception as e:
-    print "Exception raised: ", e
+    print ("Exception raised: ", e)
     
-print "dir(p) = ", dir(p)
-print p
+print ("dir(p) = ", dir(p))
+print (p)
 
-print str(p)
+print (str(p))
 
 
-print "bye"
+print ("bye")
 
