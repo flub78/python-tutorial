@@ -11,7 +11,7 @@ execution:
 """
 
 
-from ring import *
+from package.ring import *
 import unittest
 
 # Stange no iterator defined and it works ....

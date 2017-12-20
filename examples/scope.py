@@ -7,7 +7,7 @@ try:
     b += 2
     assert (False, "Exception not raise when a variable is referenced before to be used")
 except Exception as e:
-    print "Exception raised when a variable is referenced before to be used"
+    print "Expected exception raised when a variable is referenced before to be used"
 
 
 a = 5
