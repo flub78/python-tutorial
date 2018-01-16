@@ -1,1 +1,1 @@
-print "\nInitialization of the package: package"
+print ("\nInitialization of the package: package")

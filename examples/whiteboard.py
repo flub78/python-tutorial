@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding:utf8 -*
 
-print "Object management"
+print ("Object management")
 
 class Whiteboard:
     """
@@ -24,11 +24,11 @@ class Whiteboard:
 classroom = Whiteboard()
 classroom.write("Hello")
 classroom.write("World")
-print classroom.display()
+print (classroom.display())
 
 classroom.erase()
 classroom.write("Hello World")
-print classroom.display()
+print (classroom.display())
 
-print "bye"
+print ("bye")
 

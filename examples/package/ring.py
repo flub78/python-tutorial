@@ -51,7 +51,7 @@ class RingIterator:
 		self._i = 0
 		self._ring = ring
 		
-	def next(self):
+	def __next__(self):
 		i = self._i
 		self._i += 1
 		if (self._i > len(self._ring)):
@@ -70,7 +70,7 @@ if __name__ == "__main__":
 	t.append(3)
 	t.append(4)
 	assert(len(t) == 3)
-	print t
+	print (t)
 	assert(t[0] == 2)
 	assert(t[2] == 4)
 	t[2] = 5
@@ -78,5 +78,5 @@ if __name__ == "__main__":
 	assert(3 in t)		# strange, True even if __contains__ is not redefined
 	
 	t + 17
-	print t
+	print (t)
 	

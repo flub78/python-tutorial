@@ -38,7 +38,7 @@ class RingTest(unittest.TestCase):
         # cannot compare a ring and a list
         # self.assertTrue(r == [3, 4, 5, 6], "correct ring values")
 
-        print r
+        print (r)
         
     def test_iter(self):
         self.assertTrue(True, "check iteration")
@@ -51,7 +51,7 @@ class RingTest(unittest.TestCase):
         r + 5
         i = 0
         for elt in r:
-            print 'r[', i, '] =', elt
+            print ('r[', i, '] =', elt)
             i += 1
         
         
