@@ -65,6 +65,7 @@ def help():
         help : print this
         quit : exit the interpretor
     """
+<<<<<<< HEAD
     print (hlp)
 
 class States(Enum):
@@ -94,4 +95,35 @@ def interpretor():
 interpretor()
 
 print ("bye")
+=======
+    print hlp
+
+class States(Enum):
+    ASK_NAME = 1
+    GAME = 2
+    ATTEMPTS = 3
+    
+def interpretor():
+    """ The interpretor event loop """
+    
+    state = States.ASK_NAME
+    
+    try:
+        while True:
+            line = raw_input(">: ")
+            print line
+            if (line == "quit"):
+                break
+            elif (line == "help"):
+                help()
+            state = States.GAME
+            state = States.UNKNOW
+            
+    except:
+        all
+    
+interpretor()
+
+print "bye"
+>>>>>>> branch 'master' of https://github.com/flub78/python-tutorial.git
 

@@ -10,6 +10,7 @@ ERROR:root:Logging of an error on default logger
 DEBUG:root:This message should go to the log file
 INFO:root:So should this
 WARNING:root:And this, too
+<<<<<<< HEAD
 ERROR:root:Logging of an error on default logger
 DEBUG:root:This message should go to the log file
 INFO:root:So should this
@@ -18,3 +19,5 @@ ERROR:root:Logging of an error on default logger
 DEBUG:root:This message should go to the log file
 INFO:root:So should this
 WARNING:root:And this, too
+=======
+>>>>>>> branch 'master' of https://github.com/flub78/python-tutorial.git
