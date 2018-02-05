@@ -16,17 +16,22 @@ def help():
 
 def interpretor():
 	""" The interpretor event loop """
-	try:
-		while True:
-			line = raw_input(">: ")
+	while True:
+		try:
+			# line = raw_input(">: ")	python 2.7 version
+			line = input(">: ")
 			print (line)
 			if (line == "quit"):
 				break
 			elif (line == "help"):
 				help()
-	except:
-		all
+		except Exception as e:
+			print ("User exception caught")
+			print (e)
+#	except:
+#		all
 	
 interpretor()
 print ("bye")
+input()
 
