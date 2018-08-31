@@ -8,55 +8,55 @@
   * the player can guess letters 
   * score = remaining attempts to guess the word (out of 8)
   * computes and record player score
-  
+
+The program is a finite state machine
+
 @startuml
 
-[*] --> AskName
-AskName --> [*]
+[*] --> waitForPlayer
+waitForPlayer --> [*] : quit
 
-AskName : What is your name?
+waitForPlayer : What is your name?
 
-AskName -> Game : name
-Game --> [*]
+waitForPlayer -down-> GameInProgress : name
+waitForPlayer -up-> waitForPlayer : inccorectName
 
-Game --> Attempts : start
-Attempts --> Game : 8th
-Attempts --> Attempts : letter
-Attempts --> [*]
+GameInProgress --> GameInProgress : letter
+GameInProgress --> waitForPlayer : 8th
+
+@enduml
+
+Classes and responsibilities
+
+UserInterface: Get user inputs, display status
+GameEngine: Manages the game states.
+
+@startuml
+
+Title: Title
+
+class GameEngine{
+    string input(string) : returns a string to display
+    boolean gameCompleted()
+}
+note right : This is a note
+
+UserInterface "1" --> "1" GameEngine : triggers
 
 @enduml
 
 """
 
 # Python libraries
-from random import randrange
-from enum import Enum
 
 # Project libraries
 # first form gives access and requires fully specified names 
-import hangman.config
+# import hangman.config
 # second form gives access and allows short names
 from hangman.config import *
 from hangman.dictionary import *
-
-# print "hangman.config.attempts = ", hangman.config.attempts
-# print "attempts = ", attempts
-
-# print "list in order"
-# i = 0
-# for w in words:
-#     print "words[", i, "]", w
-#     i += 1
+from hangman.game_engine import GameEngine
     
-nb = len(words)
-print ("number of words = ", nb)
-
-# generate a random number and display the word
-print ("words out of order")
-for x in range(0, nb):
-    rd = randrange(0, nb)
-    print ("\t-> ", words[x], " : ", rd, words[rd])
-
 def help():
     """ Lists supported commands """
 
@@ -65,65 +65,32 @@ def help():
         help : print this
         quit : exit the interpretor
     """
-<<<<<<< HEAD
     print (hlp)
-
-class States(Enum):
-    ASK_NAME = 1
-    GAME = 2
-    ATTEMPTS = 3
     
 def interpretor():
     """ The interpretor event loop """
     
-    state = States.ASK_NAME
-    
-    try:
-        while True:
-            line = raw_input(">: ")
+    ge = GameEngine()
+        
+    while True:
+        try:
+            line = input(ge.prompt())
             print (line)
             if (line == "quit"):
                 break
             elif (line == "help"):
                 help()
-            state = States.GAME
-            state = States.UNKNOW
-            
-    except:
-        all
+            else:
+                # process an input according to the state
+                result = ge.input(line)
+                if (result != ""):
+                    print(result)
+                            
+        except Exception as e:
+            print ("User exception caught")
+            print (e)
+            # all
     
 interpretor()
 
 print ("bye")
-=======
-    print hlp
-
-class States(Enum):
-    ASK_NAME = 1
-    GAME = 2
-    ATTEMPTS = 3
-    
-def interpretor():
-    """ The interpretor event loop """
-    
-    state = States.ASK_NAME
-    
-    try:
-        while True:
-            line = raw_input(">: ")
-            print line
-            if (line == "quit"):
-                break
-            elif (line == "help"):
-                help()
-            state = States.GAME
-            state = States.UNKNOW
-            
-    except:
-        all
-    
-interpretor()
-
-print "bye"
->>>>>>> branch 'master' of https://github.com/flub78/python-tutorial.git
-

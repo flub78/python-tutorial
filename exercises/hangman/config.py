@@ -6,4 +6,4 @@
 
 attempts = 8
 
-print ("hangman.config")
+# print ("hangman.config")
