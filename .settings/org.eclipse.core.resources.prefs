@@ -34,5 +34,7 @@ encoding//exercises/hangman.py=utf-8
 encoding//exercises/hangman/config.py=utf8
 encoding//exercises/hangman/dictionary.py=utf8
 encoding//exercises/lib/sorted_dictionary.py=utf8
+encoding//exercises/number_challenge.py=utf8
 encoding//exercises/sudoku.py=utf8
+encoding//exercises/test_game_engine.py=utf8
 encoding//exercises/test_sorted_dictionary.py=utf8

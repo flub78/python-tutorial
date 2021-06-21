@@ -24,7 +24,7 @@ import random
 def mult(n):
 	i = 1
 	while (i <= 10):
-		print str(n), " * ", str(i), " = ", str(i * n)
+		print (str(n), " * ", str(i), " = ", str(i * n))
 		i += 1
 
 
@@ -33,18 +33,18 @@ if __name__ == "__main__":
 	balance = 10
 	
 	while balance >= 0:
-		print "your balance = ", balance
+		print ("your balance = ", balance)
 		cell = input('expected number: ')
 		actual = random.randint(0, 49)
 		balance -= 2
-		print "real = ", actual
+		print ("real = ", actual)
 		if (actual == 0):
 			pass
 		elif cell == actual:
 			balance += 49
-			print "win"
+			print ("win")
 		elif ((cell % 2) == (actual % 2)): 
 			balance += 3
-			print "color"
+			print ("color")
 		
-	print "you are broke"
+	print ("you are broke")
