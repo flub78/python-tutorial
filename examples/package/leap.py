@@ -20,8 +20,8 @@ def leap_year(year):
 # unit tests
 
 if __name__ == "__main__":
-  print "leap_year(2016) = ", leap_year(2016)
-  print "leap_year(1900) = ", leap_year(1900)
+  print ("leap_year(2016) = ", leap_year(2016))
+  print ("leap_year(1900) = ", leap_year(1900))
   assert leap_year(2016)
   assert not leap_year(2015)
   assert leap_year(2000)
