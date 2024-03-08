@@ -11,7 +11,6 @@ if re.search(reg, 'abcdef'):
 reg = r'abc*'
 if re.match(reg, 'abcccdef'):
     print ("match abc*")
-    print (r"\1")
     
 reg = r'abc+'    
 r = re.search(reg, 'abdef')   
@@ -30,3 +29,32 @@ text2 = '''/* this is a
     '''
 print (comment.findall(text2))
 
+# Metadata
+
+str = "varchar(255)"
+reg = r'(.+)\((.*)\)'
+r = re.match(reg, str)
+size = r.group(2)
+print ('varchar(255) group 1', r.group(1))
+print ('varchar(255) group 2', size)
+print ('isDigit', size.isdigit())
+
+str = "timestamp"
+r = re.match(reg, str)      
+print ('timestamp ', r)
+
+
+str = "enum('light','dark')"
+r = re.match(reg, str)
+insideBrackets = r.group(2)
+print ('enum ', insideBrackets)
+print ('isDigit', size.isdigit())
+
+str = "float(10.2)"
+r = re.match(reg, str)
+insideBrackets = r.group(2)
+
+float_reg = r'(\d+)\.(\d+)'
+print ('isFloat ', re.match(float_reg, insideBrackets))
+print ('float ', insideBrackets)
+print ('isDigit', insideBrackets.isdigit())
