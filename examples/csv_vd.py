@@ -5,6 +5,7 @@ import sys
 import csv
 import os
 import re  
+import decimal
 
 if len(sys.argv) <= 2:
     print("Please provide a CSV input and result file, args=", len(sys.argv))
@@ -13,7 +14,7 @@ if len(sys.argv) <= 2:
 # Fonction pour convertir une date du format JJ/MM/YY vers YYYY-MM-DD
 def convert_date(date_str):
     if not date_str or date_str.strip() == '':
-        return ''
+        return "NULL"
     
     # Nettoyer la chaîne date
     date_str = date_str.strip()
@@ -38,15 +39,15 @@ def convert_date(date_str):
             return f"{year}-{month}-{day}"
         else:
             print(f"Format de date non reconnu: {date_str}")
-            return ''
+            return 'NULL'
     except Exception as e:
         print(f"Erreur lors de la conversion de la date {date_str}: {e}")
-        return ''
+        return 'NULL'
 
 in_headers = ['n°', 'opérateur', 'Date de vente', 'Type de vol', 'Prix', 'mode règle,', 'Bénéficiaire', 'N° à contacter', 'Nb personnes', 'Date du vol', 'Appareil', 'Pilote', '', '', '', '', '', '']
 
 out_headers = [
-            'id', 'saisie_par', 'date_vente', 'club', 'product', 'beneficiaire',
+            'id', 'date_vente', 'club', 'product', 'saisie_par', 'beneficiaire',
             'de_la_part', 'occasion', 'paiement', 'participation', 'beneficiaire_email',
             'beneficiaire_tel', 'urgence', 'date_planning', 'time_planning',
             'date_vol', 'time_vol', 'pilote', 'airplane_immat', 'cancelled',
@@ -76,6 +77,20 @@ def cancelled(row):
             return 1
     return 0
 
+def clean_price(price_str):
+    if not price_str or price_str.strip() == '':
+        return decimal.Decimal('0.0')
+    
+    # Remove any non-numeric characters except decimal point
+    # Replace comma with dot for decimal separator
+    cleaned_price = re.sub(r'[^\d.,]', '', price_str).replace(',', '.')
+    
+    try:
+        return format(decimal.Decimal(cleaned_price) )
+    except decimal.InvalidOperation:
+        print(f"Invalid price format: {price_str}, using 0.0")
+        return decimal.Decimal('0.0')
+
 '''
 abbeville
 baie
@@ -87,7 +102,7 @@ falaises_ulm
 ''' 
 def product(row):
     product = row[3]
-    if product.lower().strip()=='planeur' or product.lower().strip()=='vv':
+    if 'planeur' in product.lower().strip() or 'vv' in product.lower().strip():
             return 'planeur' 
     if "BS" in product.upper():
         product = "baie"
@@ -99,44 +114,61 @@ def product(row):
         product = "baie"
     else:
         product = "unknow product |" + product + "|"
-
     if 'ULM' in row[3].upper():
         product += "_ulm"
-          
     return product
+
+def machine(row):
+    res = row[10].upper()
+    if "KL" in res:
+        res = "F-GLKL"
+    if "BE" in res or "172" in res:
+        res = "F-HABE"
+    if "RP" in res:
+        res = "F-GSRP"
+    if "KB" in res:
+        res = "F-KB"
+    if "VA" in res:
+        res = "F-JTVA"
+    if "CT" in res or "RV" in res:
+        res = "F-JHRV"
+    return res
 
 def convert_row(row):
     print("")
     nr = []
 
-    nr.append( row[0])
-    nr.append( row[1])
+    nr.append( row[0])                  # id
     nr.append( convert_date(row[2]))
     nr.append( club(row))
     nr.append( product(row))
+    nr.append( row[1])                  # saisie par
     nr.append( beneficiaire(row))
     nr.append( "")      # de la part
     nr.append( "")      # occasion
     nr.append( paiement(row))
     nr.append( "")   # participation
-    nr.append( "")   # email
-    nr.append( "")   # tel
+    nr.append( "")   # beneficiaire_email
+    nr.append( "")   # beneficiaire_tel
     nr.append( row[7])   # urgence
-    nr.append( "")   # date planning
-    nr.append( "")   # time planning
+    nr.append( "NULL")   # date planning
+    nr.append( "NULL")   # time planning
     nr.append( convert_date(row[9])) # date vol
-    nr.append( "")   # time vol
+    nr.append( "NULL")   # time vol
     nr.append( row[11])   # pilote
-    nr.append( row[10])   # immat
+    nr.append( machine(row))   # immat
     nr.append( cancelled(row))  
-    nr.append( row[8])   # nb pers
-    nr.append( row[4])   # prix
+    nr.append( row[8] if (row[8] != "") else 1)   # nb pers
+    # nr.append( clean_price(row[4]))   # prix
+    nr.append( '0.0')   # prix
 
     i = 0;
-    for fld in nr:
-        print (out_headers[i], nr[i])
-        i += 1
+    # for fld in nr:
+    #     print (out_headers[i], nr[i])
+    #     i += 1
+    print (nr)
     return nr
+
 
 # declare a dictionary to store the results
 data = {}
