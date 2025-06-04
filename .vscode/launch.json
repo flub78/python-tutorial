@@ -8,8 +8,7 @@
             "program": "${file}",
             "console": "integratedTerminal",
             "justMyCode": "true",
-            "cwd": "/home/frederic/workspace/trello-backend",
-            "args": "-u phpmyadmin -p Database4Linux!  --create -v"
+            "cwd": "/home/frederic/git/python-tutorial/examples"
         }
     ]
 }
