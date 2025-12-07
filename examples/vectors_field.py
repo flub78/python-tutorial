@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 
 # Paramètres
 omega = 1.0  # vitesse angulaire (rad/s)
-V_uniforme = np.array([1.0, 0.0])  # champ uniforme (Vx, Vy)
+V_uniforme = np.array([0.0, 0.0])  # champ uniforme (Vx, Vy)
 rayon_disque = 3.0
 
 # Grille de points
