@@ -645,6 +645,23 @@
             margin: 10px 0;
         }
 
+        .ligne-tentative {
+            display: flex;
+            justify-content: center;
+            gap: 5px;
+            margin: 8px 0;
+            padding: 8px;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .ligne-tentative.active {
+            background-color: #e8f5e9;
+            padding: 10px;
+            border: 2px solid #4CAF50;
+            box-shadow: 0 0 10px rgba(76, 175, 80, 0.3);
+        }
+
         .tentative-groupe {
             display: flex;
             align-items: center;
@@ -662,6 +679,23 @@
             color: #4CAF50;
             min-width: 30px;
             text-align: center;
+        }
+
+        .case-lettre {
+            width: 50px;
+            height: 50px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            font-size: 24px;
+            font-weight: bold;
+            background-color: white;
+        }
+
+        .case-lettre.remplie {
+            border-color: #999;
         }
 
         .lettre-jeu {
@@ -798,11 +832,8 @@
                 <h2>Tentez de deviner le mot</h2>
                 <div class="info-text" id="jeuInfo"></div>
                 
-                <div style="text-align: center; margin: 20px 0;">
-                    <div class="input-lettres-container" id="inputLettresContainer"></div>
-                    <br>
-                    <button onclick="soumettreMotJeu()">Valider</button>
-                </div>
+                <!-- Grille des 6 tentatives -->
+                <div id="grilleJeu" style="margin: 20px auto; max-width: 400px;"></div>
 
                 <!-- Clavier AZERTY -->
                 <div class="clavier-container" id="clavierJeu">
@@ -841,7 +872,10 @@
                     </div>
                 </div>
 
-                <div class="tentatives-jeu" id="tentativesJeu"></div>
+                <!-- Bouton Valider -->
+                <div style="text-align: center; margin: 20px 0;">
+                    <button onclick="soumettreMotJeu()" style="padding: 12px 30px; font-size: 16px; font-weight: bold; background-color: #4CAF50; color: white; border: none; border-radius: 6px; cursor: pointer;">Valider</button>
+                </div>
             </div>
 
             <div class="legende-section">
@@ -1317,14 +1351,13 @@
             partieTerminee = false;
 
             // Réinitialiser l'interface
-            document.getElementById('tentativesJeu').innerHTML = '';
             document.getElementById('jeuSection').classList.remove('hidden');
             
             // Réinitialiser le clavier
             reinitialiserClavier();
             
-            // Créer les champs de saisie
-            creerChampsLettres(longueur);
+            // Créer la grille de 6 lignes
+            creerGrilleJeu(longueur);
             
             updateJeuInfo();
             showMessage('jeuMessage', `Partie démarrée ! Trouvez le mot de ${longueur} lettres commençant par ${motSecret[0]}`, 'success');
@@ -1332,47 +1365,79 @@
             console.log('Mot secret:', motSecret); // Pour debug
         }
 
-        // Créer les champs de saisie pour les lettres
-        function creerChampsLettres(longueur) {
-            let container = document.getElementById('inputLettresContainer');
-            container.innerHTML = '';
+        // Créer la grille de jeu avec 6 lignes
+        function creerGrilleJeu(longueur) {
+            let grille = document.getElementById('grilleJeu');
+            grille.innerHTML = '';
             
-            for (let i = 0; i < longueur; i++) {
-                let input = document.createElement('input');
-                input.type = 'text';
-                input.maxLength = 1;
-                input.className = 'input-lettre';
-                input.id = `lettre-${i}`;
-                
-                // Première lettre pré-remplie et désactivée
-                if (i === 0) {
-                    input.value = motSecret[0];
-                    input.disabled = true;
+            for (let ligne = 0; ligne < maxTentatives; ligne++) {
+                let ligneDiv = document.createElement('div');
+                ligneDiv.className = 'ligne-tentative';
+                ligneDiv.id = `ligne-${ligne}`;
+                if (ligne === 0) {
+                    ligneDiv.classList.add('active');
                 }
                 
-                // Navigation automatique entre les champs
-                input.addEventListener('input', function(e) {
-                    if (this.value.length === 1 && i < longueur - 1) {
-                        document.getElementById(`lettre-${i + 1}`).focus();
+                for (let i = 0; i < longueur; i++) {
+                    let caseDiv = document.createElement('div');
+                    caseDiv.className = 'case-lettre';
+                    caseDiv.id = `case-${ligne}-${i}`;
+                    
+                    // Première lettre de la première ligne pré-remplie
+                    if (ligne === 0 && i === 0) {
+                        caseDiv.textContent = motSecret[0];
+                        caseDiv.classList.add('remplie');
+                        caseDiv.style.backgroundColor = '#D32F2F';
+                        caseDiv.style.color = 'white';
+                        caseDiv.style.borderColor = '#B71C1C';
                     }
-                });
+                    
+                    ligneDiv.appendChild(caseDiv);
+                }
                 
-                // Retour arrière
-                input.addEventListener('keydown', function(e) {
-                    if (e.key === 'Backspace' && this.value === '' && i > 0) {
-                        document.getElementById(`lettre-${i - 1}`).focus();
-                    }
-                    if (e.key === 'Enter') {
-                        soumettreMotJeu();
-                    }
-                });
-                
-                container.appendChild(input);
+                grille.appendChild(ligneDiv);
             }
             
-            // Focus sur le deuxième champ
-            if (longueur > 1) {
-                document.getElementById('lettre-1').focus();
+            // Ajouter le gestionnaire d'événements pour le clavier physique
+            ajouterEcouteurClavierJeu();
+        }
+
+        // Ajouter l'écouteur du clavier physique
+        function ajouterEcouteurClavierJeu() {
+            // Retirer l'ancien écouteur s'il existe
+            document.removeEventListener('keydown', gererToucheClavierJeu);
+            // Ajouter le nouvel écouteur
+            document.addEventListener('keydown', gererToucheClavierJeu);
+        }
+
+        // Gérer les touches du clavier physique
+        function gererToucheClavierJeu(e) {
+            // Ne rien faire si la partie est terminée ou si on n'est pas dans l'onglet jeu
+            if (partieTerminee || !document.getElementById('jeu-tab').classList.contains('active')) {
+                return;
+            }
+
+            // Ignorer si on est dans un champ de saisie
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+                return;
+            }
+
+            const key = e.key.toUpperCase();
+
+            // Lettres A-Z
+            if (key.length === 1 && key >= 'A' && key <= 'Z') {
+                e.preventDefault();
+                ajouterLettreJeu(key);
+            }
+            // Backspace ou Delete
+            else if (e.key === 'Backspace' || e.key === 'Delete') {
+                e.preventDefault();
+                effacerLettreJeu();
+            }
+            // Enter
+            else if (e.key === 'Enter') {
+                e.preventDefault();
+                soumettreMotJeu();
             }
         }
 
@@ -1388,11 +1453,11 @@
                 return;
             }
 
-            // Récupérer le mot depuis les champs
+            // Récupérer le mot depuis la ligne active
             let motPropose = '';
             for (let i = 0; i < motSecret.length; i++) {
-                let input = document.getElementById(`lettre-${i}`);
-                motPropose += (input.value || '').toUpperCase();
+                let caseDiv = document.getElementById(`case-${tentativesJeu}-${i}`);
+                motPropose += (caseDiv.textContent || '').toUpperCase();
             }
             
             // Validations
@@ -1411,93 +1476,77 @@
                 return;
             }
 
-            // Traiter la tentative
-            tentativesJeu++;
-            afficherTentativeJeu(motPropose);
+            // Colorer la ligne avec les résultats
+            colorerLigne(tentativesJeu, motPropose);
+            
+            // Mettre à jour l'état du clavier
+            let pattern = genererPattern(motPropose, motSecret);
+            mettreAJourClavier(motPropose, pattern);
             
             // Vérifier si gagné
             if (motPropose === motSecret) {
                 partieTerminee = true;
-                showMessage('jeuMessage', `🎉 Bravo ! Vous avez trouvé le mot "${motSecret}" en ${tentativesJeu} tentative(s) !`, 'success');
-                desactiverChampsLettres();
+                showMessage('jeuMessage', `🎉 Bravo ! Vous avez trouvé le mot "${motSecret}" en ${tentativesJeu + 1} tentative(s) !`, 'success');
                 return;
             }
+
+            // Incrémenter tentatives
+            tentativesJeu++;
 
             // Vérifier si perdu
             if (tentativesJeu >= maxTentatives) {
                 partieTerminee = true;
                 showMessage('jeuMessage', `😞 Perdu ! Le mot était "${motSecret}"`, 'error');
-                desactiverChampsLettres();
                 return;
             }
 
-            // Continuer
-            viderChampsLettres();
+            // Activer la ligne suivante
+            document.getElementById(`ligne-${tentativesJeu - 1}`).classList.remove('active');
+            document.getElementById(`ligne-${tentativesJeu}`).classList.add('active');
+            
+            // Pré-remplir la première lettre de la nouvelle ligne
+            let premiereCaseNouvelleLigne = document.getElementById(`case-${tentativesJeu}-0`);
+            premiereCaseNouvelleLigne.textContent = motSecret[0];
+            premiereCaseNouvelleLigne.classList.add('remplie');
+            premiereCaseNouvelleLigne.style.backgroundColor = '#D32F2F';
+            premiereCaseNouvelleLigne.style.color = 'white';
+            premiereCaseNouvelleLigne.style.borderColor = '#B71C1C';
+            
             updateJeuInfo();
             showMessage('jeuMessage', '', 'info');
         }
 
-        // Vider les champs de lettres (sauf le premier)
-        function viderChampsLettres() {
-            for (let i = 1; i < motSecret.length; i++) {
-                document.getElementById(`lettre-${i}`).value = '';
-            }
-            document.getElementById('lettre-1').focus();
-        }
-
-        // Désactiver les champs de lettres
-        function desactiverChampsLettres() {
-            for (let i = 0; i < motSecret.length; i++) {
-                document.getElementById(`lettre-${i}`).disabled = true;
-            }
-        }
-
-        // Afficher une tentative
-        function afficherTentativeJeu(motPropose) {
+        // Colorer une ligne selon le pattern
+        function colorerLigne(numLigne, motPropose) {
             let pattern = genererPattern(motPropose, motSecret);
             
-            // Créer le conteneur du groupe
-            let groupeDiv = document.createElement('div');
-            groupeDiv.className = 'tentative-groupe';
-            
-            // Ajouter le numéro de tentative
-            let numeroDiv = document.createElement('div');
-            numeroDiv.className = 'tentative-numero';
-            numeroDiv.textContent = tentativesJeu;
-            groupeDiv.appendChild(numeroDiv);
-            
-            // Créer la rangée de lettres
-            let tentativeDiv = document.createElement('div');
-            tentativeDiv.className = 'tentative-row';
-            tentativeDiv.style.margin = '0'; // Réinitialiser la marge car elle est gérée par le groupe
-            
             for (let i = 0; i < motPropose.length; i++) {
-                let lettreDiv = document.createElement('div');
-                lettreDiv.className = 'lettre-jeu';
-                lettreDiv.textContent = motPropose[i];
+                let caseDiv = document.getElementById(`case-${numLigne}-${i}`);
                 
                 if (pattern[i] === '=') {
-                    lettreDiv.style.backgroundColor = '#D32F2F';
-                    lettreDiv.style.color = 'white';
-                    lettreDiv.style.borderColor = '#B71C1C';
+                    caseDiv.style.backgroundColor = '#D32F2F';
+                    caseDiv.style.color = 'white';
+                    caseDiv.style.borderColor = '#B71C1C';
                 } else if (pattern[i] === '?') {
-                    lettreDiv.style.backgroundColor = '#C9B458';
-                    lettreDiv.style.color = 'white';
-                    lettreDiv.style.borderColor = '#B8A040';
+                    caseDiv.style.backgroundColor = '#C9B458';
+                    caseDiv.style.color = 'white';
+                    caseDiv.style.borderColor = '#B8A040';
                 } else {
-                    lettreDiv.style.backgroundColor = '#5B8FDB';
-                    lettreDiv.style.color = 'white';
-                    lettreDiv.style.borderColor = '#4A7FCA';
+                    caseDiv.style.backgroundColor = '#5B8FDB';
+                    caseDiv.style.color = 'white';
+                    caseDiv.style.borderColor = '#4A7FCA';
                 }
-                
-                tentativeDiv.appendChild(lettreDiv);
             }
-            
-            groupeDiv.appendChild(tentativeDiv);
-            document.getElementById('tentativesJeu').appendChild(groupeDiv);
-            
-            // Mettre à jour l'état du clavier
-            mettreAJourClavier(motPropose, pattern);
+        }
+
+        // Vider les champs de lettres (obsolète mais gardée pour compatibilité)
+        function viderChampsLettres() {
+            // Ne fait plus rien - gardée pour compatibilité
+        }
+
+        // Désactiver les champs de lettres (obsolète mais gardée pour compatibilité)
+        function desactiverChampsLettres() {
+            // Ne fait plus rien - gardée pour compatibilité
         }
 
         // Fonction pour ajouter une lettre depuis le clavier
@@ -1506,15 +1555,12 @@
                 return;
             }
 
-            // Trouver le premier champ vide (en sautant le premier qui est désactivé)
+            // Trouver la première case vide de la ligne active (en sautant la première qui est pré-remplie)
             for (let i = 1; i < motSecret.length; i++) {
-                let input = document.getElementById(`lettre-${i}`);
-                if (!input.value) {
-                    input.value = lettre;
-                    // Passer au champ suivant si possible
-                    if (i + 1 < motSecret.length) {
-                        document.getElementById(`lettre-${i + 1}`).focus();
-                    }
+                let caseDiv = document.getElementById(`case-${tentativesJeu}-${i}`);
+                if (!caseDiv.textContent || caseDiv.textContent === '') {
+                    caseDiv.textContent = lettre;
+                    caseDiv.classList.add('remplie');
                     return;
                 }
             }
@@ -1526,12 +1572,12 @@
                 return;
             }
 
-            // Trouver le dernier champ rempli (en partant de la fin, sauf le premier)
+            // Trouver la dernière case remplie de la ligne active (en partant de la fin, sauf la première)
             for (let i = motSecret.length - 1; i >= 1; i--) {
-                let input = document.getElementById(`lettre-${i}`);
-                if (input.value) {
-                    input.value = '';
-                    input.focus();
+                let caseDiv = document.getElementById(`case-${tentativesJeu}-${i}`);
+                if (caseDiv.textContent && caseDiv.textContent !== '') {
+                    caseDiv.textContent = '';
+                    caseDiv.classList.remove('remplie');
                     return;
                 }
             }
