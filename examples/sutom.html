@@ -498,8 +498,144 @@
             }
         }
 
+        .filtre-position {
+            width: 40px;
+            height: 40px;
+            font-size: 18px;
+            font-weight: bold;
+            text-transform: uppercase;
+            text-align: center;
+            border: 2px solid #ccc;
+            border-radius: 6px;
+            padding: 0;
+        }
+
+        .filtre-position:focus {
+            outline: none;
+            border-color: #4CAF50;
+            box-shadow: 0 0 5px rgba(76, 175, 80, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            .filtre-position {
+                width: 35px;
+                height: 35px;
+                font-size: 16px;
+            }
+        }
+
         .tentatives-jeu {
             margin-top: 20px;
+        }
+
+        /* Clavier AZERTY */
+        .clavier-container {
+            margin: 20px auto;
+            max-width: 650px;
+        }
+
+        .clavier-row {
+            display: flex;
+            justify-content: center;
+            gap: 4px;
+            margin-bottom: 6px;
+        }
+
+        .touche-clavier {
+            min-width: 40px;
+            height: 50px;
+            padding: 0 8px;
+            font-size: 16px;
+            font-weight: bold;
+            text-transform: uppercase;
+            border: 2px solid #999;
+            border-radius: 6px;
+            background-color: #666;
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .touche-clavier:hover:not(:disabled) {
+            background-color: #555;
+            transform: translateY(-2px);
+        }
+
+        .touche-clavier:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        .touche-clavier:disabled {
+            background-color: #5B8FDB;
+            color: white;
+            border-color: #4A7FCA;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .touche-clavier.bien-placee {
+            background-color: #D32F2F;
+            color: white;
+            border-color: #B71C1C;
+        }
+
+        .touche-clavier.mal-placee {
+            background-color: #C9B458;
+            color: white;
+            border-color: #B8A040;
+        }
+
+        @media (max-width: 768px) {
+            .touche-clavier {
+                min-width: 30px;
+                height: 40px;
+                font-size: 14px;
+                padding: 0 5px;
+            }
+        }
+
+        /* Accordéon */
+        .accordion-header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px 15px;
+            cursor: pointer;
+            border: none;
+            width: 100%;
+            text-align: left;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .accordion-header:hover {
+            background-color: #45a049;
+        }
+
+        .accordion-header::after {
+            content: '▼';
+            font-size: 12px;
+            transition: transform 0.3s;
+        }
+
+        .accordion-header.active::after {
+            transform: rotate(180deg);
+        }
+
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+            padding: 0 15px;
+        }
+
+        .accordion-content.active {
+            max-height: 200px;
+            padding: 15px;
         }
 
         .tentative-row {
@@ -507,6 +643,25 @@
             justify-content: center;
             gap: 5px;
             margin: 10px 0;
+        }
+
+        .tentative-groupe {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            border-left: 4px solid #4CAF50;
+        }
+
+        .tentative-numero {
+            font-size: 18px;
+            font-weight: bold;
+            color: #4CAF50;
+            min-width: 30px;
+            text-align: center;
         }
 
         .lettre-jeu {
@@ -536,11 +691,17 @@
 
         <!-- Section commune de chargement du dictionnaire -->
         <div class="config-section" id="fichierDicoSection">
-            <h2>Dictionnaire</h2>
-            <div class="form-group" id="fichierDicoGroup">
-                <label for="fichierDico">Fichier dictionnaire:</label>
-                <input type="file" id="fichierDico" accept=".txt" onchange="chargerFichierDictionnaire()">
-                <span style="margin-left: 10px; color: #666; font-size: 12px;" id="dicoStatus">Chargement du dictionnaire...</span>
+            <button class="accordion-header" onclick="toggleAccordion()">
+                <span>Dictionnaire</span>
+            </button>
+            <div class="accordion-content" id="accordionContent">
+                <div style="margin-top: 10px;">
+                    <span style="color: #666; font-size: 14px; display: block; margin-bottom: 10px;" id="dicoStatus">Chargement du dictionnaire...</span>
+                    <div class="form-group">
+                        <label for="fichierDico">Charger un autre fichier:</label>
+                        <input type="file" id="fichierDico" accept=".txt" onchange="chargerFichierDictionnaire()">
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -548,6 +709,7 @@
         <div class="tabs">
             <button class="tab active" onclick="switchTab('aide')">Aide à la résolution</button>
             <button class="tab" onclick="switchTab('jeu')">Jouer</button>
+            <button class="tab" onclick="switchTab('dico')">Dictionnaire</button>
         </div>
 
         <!-- Onglet Aide -->
@@ -642,6 +804,43 @@
                     <button onclick="soumettreMotJeu()">Valider</button>
                 </div>
 
+                <!-- Clavier AZERTY -->
+                <div class="clavier-container" id="clavierJeu">
+                    <div class="clavier-row">
+                        <button class="touche-clavier" onclick="ajouterLettreJeu('A')">A</button>
+                        <button class="touche-clavier" onclick="ajouterLettreJeu('Z')">Z</button>
+                        <button class="touche-clavier" onclick="ajouterLettreJeu('E')">E</button>
+                        <button class="touche-clavier" onclick="ajouterLettreJeu('R')">R</button>
+                        <button class="touche-clavier" onclick="ajouterLettreJeu('T')">T</button>
+                        <button class="touche-clavier" onclick="ajouterLettreJeu('Y')">Y</button>
+                        <button class="touche-clavier" onclick="ajouterLettreJeu('U')">U</button>
+                        <button class="touche-clavier" onclick="ajouterLettreJeu('I')">I</button>
+                        <button class="touche-clavier" onclick="ajouterLettreJeu('O')">O</button>
+                        <button class="touche-clavier" onclick="ajouterLettreJeu('P')">P</button>
+                    </div>
+                    <div class="clavier-row">
+                        <button class="touche-clavier" onclick="ajouterLettreJeu('Q')">Q</button>
+                        <button class="touche-clavier" onclick="ajouterLettreJeu('S')">S</button>
+                        <button class="touche-clavier" onclick="ajouterLettreJeu('D')">D</button>
+                        <button class="touche-clavier" onclick="ajouterLettreJeu('F')">F</button>
+                        <button class="touche-clavier" onclick="ajouterLettreJeu('G')">G</button>
+                        <button class="touche-clavier" onclick="ajouterLettreJeu('H')">H</button>
+                        <button class="touche-clavier" onclick="ajouterLettreJeu('J')">J</button>
+                        <button class="touche-clavier" onclick="ajouterLettreJeu('K')">K</button>
+                        <button class="touche-clavier" onclick="ajouterLettreJeu('L')">L</button>
+                        <button class="touche-clavier" onclick="ajouterLettreJeu('M')">M</button>
+                    </div>
+                    <div class="clavier-row">
+                        <button class="touche-clavier" onclick="ajouterLettreJeu('W')">W</button>
+                        <button class="touche-clavier" onclick="ajouterLettreJeu('X')">X</button>
+                        <button class="touche-clavier" onclick="ajouterLettreJeu('C')">C</button>
+                        <button class="touche-clavier" onclick="ajouterLettreJeu('V')">V</button>
+                        <button class="touche-clavier" onclick="ajouterLettreJeu('B')">B</button>
+                        <button class="touche-clavier" onclick="ajouterLettreJeu('N')">N</button>
+                        <button class="touche-clavier" onclick="effacerLettreJeu()" style="min-width: 80px;">⌫</button>
+                    </div>
+                </div>
+
                 <div class="tentatives-jeu" id="tentativesJeu"></div>
             </div>
 
@@ -661,6 +860,42 @@
                         <span>Absente</span>
                     </div>
                 </div>
+            </div>
+        </div>
+
+        <!-- Onglet Dictionnaire -->
+        <div id="dico-tab" class="tab-content">
+            <div class="config-section">
+                <h2>Filtres</h2>
+                <div class="form-group">
+                    <label for="longueurDico">Longueur des mots (0 = toutes):</label>
+                    <input type="number" id="longueurDico" min="0" max="15" value="0" onchange="changerLongueurDico()" style="width: 80px; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+                </div>
+                <div id="filtreMotsContainer" style="display: none; margin: 15px 0;">
+                    <label style="font-weight: bold; margin-bottom: 10px; display: block;">Filtrer par lettres :</label>
+                    <p style="font-size: 14px; color: #666; margin-bottom: 10px;">Ex: A en seconde colonne sélectionne les mots dont la seconde lettre est un A</p>
+                    <div class="input-lettres-container" id="filtreLettresContainer"></div>
+                    <button onclick="reinitialiserFiltreDico()" style="margin-top: 10px;">Réinitialiser</button>
+                </div>
+                <div style="margin: 15px 0;">
+                    <label style="font-weight: bold; margin-bottom: 10px; display: block;">Lettres interdites :</label>
+                    <p style="font-size: 14px; color: #666; margin-bottom: 10px;">Cochez les lettres qui ne doivent pas apparaître dans les mots</p>
+                    <div id="lettresInterdites" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(40px, 1fr)); gap: 5px; max-width: 600px;"></div>
+                </div>
+                <div style="margin: 15px 0;">
+                    <label style="font-weight: bold; margin-bottom: 10px; display: block;">Lettres obligatoires :</label>
+                    <p style="font-size: 14px; color: #666; margin-bottom: 10px;">Cochez les lettres qui doivent apparaître dans les mots</p>
+                    <div id="lettresObligatoires" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(40px, 1fr)); gap: 5px; max-width: 600px;"></div>
+                </div>
+                <div style="margin-top: 10px; font-weight: bold; color: #4CAF50;" id="compteurMots"></div>
+            </div>
+
+            <div class="config-section">
+                <h2>Mots du dictionnaire</h2>
+                <textarea id="affichageDico" 
+                          readonly 
+                          style="width: 100%; height: 400px; font-family: monospace; font-size: 14px; padding: 10px; border: 1px solid #ccc; border-radius: 4px; resize: vertical;">
+                </textarea>
             </div>
         </div>
     </div>
@@ -688,6 +923,13 @@
         let maxTentatives = 6;
         let partieTerminee = false;
 
+        // Variables globales pour le dictionnaire
+        let longueurDicoSelectionnee = 0;
+        let filtresDico = [];
+        let longueurMaxDico = 0;
+        let lettresInterdites = new Set();
+        let lettresObligatoires = new Set();
+
         // Gestion des onglets
         function switchTab(tabName) {
             // Masquer tous les contenus
@@ -707,11 +949,29 @@
             } else if (tabName === 'jeu') {
                 document.getElementById('jeu-tab').classList.add('active');
                 document.querySelectorAll('.tab')[1].classList.add('active');
+            } else if (tabName === 'dico') {
+                document.getElementById('dico-tab').classList.add('active');
+                document.querySelectorAll('.tab')[2].classList.add('active');
+                afficherDictionnaire();
             }
+        }
+
+        // Gestion de l'accordéon
+        function toggleAccordion() {
+            const header = document.querySelector('.accordion-header');
+            const content = document.getElementById('accordionContent');
+            
+            header.classList.toggle('active');
+            content.classList.toggle('active');
         }
 
         // Essayer de charger le dictionnaire par défaut au démarrage
         window.addEventListener('DOMContentLoaded', function() {
+            // Créer les checkboxes pour les lettres interdites
+            creerCheckboxesLettresInterdites();
+            // Créer les checkboxes pour les lettres obligatoires
+            creerCheckboxesLettresObligatoires();
+            
             fetch('dico.txt')
                 .then(response => {
                     if (!response.ok) {
@@ -723,10 +983,10 @@
                     dictionnaire = data.split('\n')
                         .map(mot => mot.trim().toUpperCase())
                         .filter(mot => mot.length > 0);
+                    calculerLongueurMaxDico();
+                    afficherDictionnaire();
                     document.getElementById('dicoStatus').textContent = `✓ Dictionnaire chargé: ${dictionnaire.length} mots`;
                     document.getElementById('dicoStatus').style.color = '#2e7d32';
-                    // Cacher la section de chargement si le dictionnaire par défaut est chargé
-                    document.getElementById('fichierDicoSection').style.display = 'none';
                     console.log(`Dictionnaire par défaut chargé: ${dictionnaire.length} mots`);
                 })
                 .catch(error => {
@@ -751,6 +1011,8 @@
                 dictionnaire = content.split('\n')
                     .map(mot => mot.trim().toUpperCase())
                     .filter(mot => mot.length > 0);
+                calculerLongueurMaxDico();
+                afficherDictionnaire();
                 document.getElementById('dicoStatus').textContent = `✓ Dictionnaire chargé: ${dictionnaire.length} mots`;
                 document.getElementById('dicoStatus').style.color = '#2e7d32';
                 console.log(`Dictionnaire chargé: ${dictionnaire.length} mots`);
@@ -1058,6 +1320,9 @@
             document.getElementById('tentativesJeu').innerHTML = '';
             document.getElementById('jeuSection').classList.remove('hidden');
             
+            // Réinitialiser le clavier
+            reinitialiserClavier();
+            
             // Créer les champs de saisie
             creerChampsLettres(longueur);
             
@@ -1191,8 +1456,20 @@
         function afficherTentativeJeu(motPropose) {
             let pattern = genererPattern(motPropose, motSecret);
             
+            // Créer le conteneur du groupe
+            let groupeDiv = document.createElement('div');
+            groupeDiv.className = 'tentative-groupe';
+            
+            // Ajouter le numéro de tentative
+            let numeroDiv = document.createElement('div');
+            numeroDiv.className = 'tentative-numero';
+            numeroDiv.textContent = tentativesJeu;
+            groupeDiv.appendChild(numeroDiv);
+            
+            // Créer la rangée de lettres
             let tentativeDiv = document.createElement('div');
             tentativeDiv.className = 'tentative-row';
+            tentativeDiv.style.margin = '0'; // Réinitialiser la marge car elle est gérée par le groupe
             
             for (let i = 0; i < motPropose.length; i++) {
                 let lettreDiv = document.createElement('div');
@@ -1216,7 +1493,272 @@
                 tentativeDiv.appendChild(lettreDiv);
             }
             
-            document.getElementById('tentativesJeu').appendChild(tentativeDiv);
+            groupeDiv.appendChild(tentativeDiv);
+            document.getElementById('tentativesJeu').appendChild(groupeDiv);
+            
+            // Mettre à jour l'état du clavier
+            mettreAJourClavier(motPropose, pattern);
+        }
+
+        // Fonction pour ajouter une lettre depuis le clavier
+        function ajouterLettreJeu(lettre) {
+            if (partieTerminee) {
+                return;
+            }
+
+            // Trouver le premier champ vide (en sautant le premier qui est désactivé)
+            for (let i = 1; i < motSecret.length; i++) {
+                let input = document.getElementById(`lettre-${i}`);
+                if (!input.value) {
+                    input.value = lettre;
+                    // Passer au champ suivant si possible
+                    if (i + 1 < motSecret.length) {
+                        document.getElementById(`lettre-${i + 1}`).focus();
+                    }
+                    return;
+                }
+            }
+        }
+
+        // Fonction pour effacer la dernière lettre saisie
+        function effacerLettreJeu() {
+            if (partieTerminee) {
+                return;
+            }
+
+            // Trouver le dernier champ rempli (en partant de la fin, sauf le premier)
+            for (let i = motSecret.length - 1; i >= 1; i--) {
+                let input = document.getElementById(`lettre-${i}`);
+                if (input.value) {
+                    input.value = '';
+                    input.focus();
+                    return;
+                }
+            }
+        }
+
+        // Fonction pour mettre à jour l'état des touches du clavier
+        function mettreAJourClavier(motPropose, pattern) {
+            for (let i = 0; i < motPropose.length; i++) {
+                let lettre = motPropose[i];
+                let bouton = document.querySelector(`.touche-clavier[onclick="ajouterLettreJeu('${lettre}')"]`);
+                
+                if (bouton) {
+                    if (pattern[i] === '=') {
+                        // Bien placée - rouge (priorité la plus haute)
+                        bouton.classList.remove('mal-placee');
+                        bouton.classList.add('bien-placee');
+                    } else if (pattern[i] === '?' && !bouton.classList.contains('bien-placee')) {
+                        // Mal placée - jaune (seulement si pas déjà bien placée)
+                        bouton.classList.add('mal-placee');
+                    } else if (pattern[i] === '_' && !bouton.classList.contains('bien-placee') && !bouton.classList.contains('mal-placee')) {
+                        // Absente - désactiver
+                        bouton.disabled = true;
+                    }
+                }
+            }
+        }
+
+        // Fonction pour réinitialiser le clavier
+        function reinitialiserClavier() {
+            document.querySelectorAll('.touche-clavier').forEach(bouton => {
+                bouton.disabled = false;
+                bouton.classList.remove('bien-placee', 'mal-placee');
+            });
+        }
+
+        // Fonction pour calculer la longueur maximale des mots du dictionnaire
+        function calculerLongueurMaxDico() {
+            if (dictionnaire.length === 0) {
+                longueurMaxDico = 15; // Valeur par défaut
+                return;
+            }
+            // Utiliser une boucle pour éviter le dépassement de pile avec spread operator
+            longueurMaxDico = 0;
+            for (let mot of dictionnaire) {
+                if (mot.length > longueurMaxDico) {
+                    longueurMaxDico = mot.length;
+                }
+            }
+            document.getElementById('longueurDico').max = longueurMaxDico;
+            console.log(`Longueur maximale du dictionnaire: ${longueurMaxDico}`);
+        }
+
+        // Fonction pour changer la longueur du dictionnaire à afficher
+        function changerLongueurDico() {
+            let select = document.getElementById('longueurDico');
+            longueurDicoSelectionnee = parseInt(select.value);
+            
+            let filtresContainer = document.getElementById('filtreLettresContainer');
+            let filtresSection = document.getElementById('filtreMotsContainer');
+            filtresContainer.innerHTML = '';
+            
+            if (longueurDicoSelectionnee > 0) {
+                filtresSection.style.display = 'block';
+                for (let i = 0; i < longueurDicoSelectionnee; i++) {
+                    let input = document.createElement('input');
+                    input.type = 'text';
+                    input.maxLength = 1;
+                    input.className = 'filtre-position';
+                    input.placeholder = '';
+                    input.dataset.position = i;
+                    
+                    input.addEventListener('input', function() {
+                        let val = this.value.toUpperCase();
+                        this.value = val;
+                        if (val) {
+                            filtresDico[i] = val;
+                        } else {
+                            filtresDico[i] = '';
+                        }
+                        afficherDictionnaire();
+                    });
+                    
+                    filtresContainer.appendChild(input);
+                }
+                filtresDico = new Array(longueurDicoSelectionnee).fill('');
+            } else {
+                filtresSection.style.display = 'none';
+                filtresDico = [];
+            }
+            
+            afficherDictionnaire();
+        }
+
+        // Fonction pour créer les checkboxes des lettres interdites
+        function creerCheckboxesLettresInterdites() {
+            const container = document.getElementById('lettresInterdites');
+            const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            
+            for (let lettre of alphabet) {
+                const label = document.createElement('label');
+                label.style.cssText = 'display: flex; align-items: center; cursor: pointer; padding: 5px; border: 1px solid #ccc; border-radius: 4px; background-color: #f9f9f9;';
+                
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.value = lettre;
+                checkbox.style.marginRight = '5px';
+                checkbox.addEventListener('change', function() {
+                    if (this.checked) {
+                        lettresInterdites.add(lettre);
+                    } else {
+                        lettresInterdites.delete(lettre);
+                    }
+                    afficherDictionnaire();
+                });
+                
+                const span = document.createElement('span');
+                span.textContent = lettre;
+                span.style.fontWeight = 'bold';
+                
+                label.appendChild(checkbox);
+                label.appendChild(span);
+                container.appendChild(label);
+            }
+        }
+
+        // Fonction pour créer les checkboxes des lettres obligatoires
+        function creerCheckboxesLettresObligatoires() {
+            const container = document.getElementById('lettresObligatoires');
+            const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            
+            for (let lettre of alphabet) {
+                const label = document.createElement('label');
+                label.style.cssText = 'display: flex; align-items: center; cursor: pointer; padding: 5px; border: 1px solid #ccc; border-radius: 4px; background-color: #f9f9f9;';
+                
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.value = lettre;
+                checkbox.style.marginRight = '5px';
+                checkbox.addEventListener('change', function() {
+                    if (this.checked) {
+                        lettresObligatoires.add(lettre);
+                    } else {
+                        lettresObligatoires.delete(lettre);
+                    }
+                    afficherDictionnaire();
+                });
+                
+                const span = document.createElement('span');
+                span.textContent = lettre;
+                span.style.fontWeight = 'bold';
+                
+                label.appendChild(checkbox);
+                label.appendChild(span);
+                container.appendChild(label);
+            }
+        }
+
+        // Fonction pour afficher le dictionnaire (filtré ou complet)
+        function afficherDictionnaire() {
+            if (dictionnaire.length === 0) {
+                document.getElementById('affichageDico').value = 'Dictionnaire non chargé. Utilisez le bouton ci-dessus pour charger un fichier.';
+                document.getElementById('compteurMots').textContent = '';
+                return;
+            }
+            
+            let motsAffiches = dictionnaire;
+            
+            // Filtrer par lettres interdites
+            if (lettresInterdites.size > 0) {
+                motsAffiches = motsAffiches.filter(mot => {
+                    for (let lettre of lettresInterdites) {
+                        if (mot.includes(lettre)) {
+                            return false;
+                        }
+                    }
+                    return true;
+                });
+            }
+            
+            // Filtrer par lettres obligatoires
+            if (lettresObligatoires.size > 0) {
+                motsAffiches = motsAffiches.filter(mot => {
+                    for (let lettre of lettresObligatoires) {
+                        if (!mot.includes(lettre)) {
+                            return false;
+                        }
+                    }
+                    return true;
+                });
+            }
+            
+            // Filtrer par longueur si une longueur est sélectionnée
+            if (longueurDicoSelectionnee > 0) {
+                motsAffiches = motsAffiches.filter(mot => mot.length === longueurDicoSelectionnee);
+                
+                // Filtrer par positions de lettres si des filtres sont définis
+                for (let i = 0; i < filtresDico.length; i++) {
+                    if (filtresDico[i]) {
+                        motsAffiches = motsAffiches.filter(mot => mot[i] === filtresDico[i]);
+                    }
+                }
+            }
+            
+            document.getElementById('affichageDico').value = motsAffiches.join('\n');
+            document.getElementById('compteurMots').textContent = `Nombre de mots : ${motsAffiches.length}`;
+        }
+
+        // Fonction pour réinitialiser les filtres du dictionnaire
+        function reinitialiserFiltreDico() {
+            document.getElementById('longueurDico').value = '0';
+            longueurDicoSelectionnee = 0;
+            filtresDico = [];
+            document.getElementById('filtreLettresContainer').innerHTML = '';
+            
+            // Décocher toutes les lettres interdites
+            lettresInterdites.clear();
+            document.querySelectorAll('#lettresInterdites input[type="checkbox"]').forEach(cb => {
+                cb.checked = false;
+            });
+            
+            // Décocher toutes les lettres obligatoires
+            lettresObligatoires.clear();
+            document.querySelectorAll('#lettresObligatoires input[type="checkbox"]').forEach(cb => {
+                cb.checked = false;
+            });
+            
+            afficherDictionnaire();
         }
     </script>
 </body>
