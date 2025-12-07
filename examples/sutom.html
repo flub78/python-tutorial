@@ -459,6 +459,45 @@
             text-align: center;
         }
 
+        .input-lettres-container {
+            display: flex;
+            justify-content: center;
+            gap: 5px;
+            margin: 20px 0;
+        }
+
+        .input-lettre {
+            width: 50px;
+            height: 50px;
+            font-size: 24px;
+            font-weight: bold;
+            text-transform: uppercase;
+            text-align: center;
+            border: 2px solid #4CAF50;
+            border-radius: 6px;
+            padding: 0;
+        }
+
+        .input-lettre:focus {
+            outline: none;
+            border-color: #2E7D32;
+            box-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
+        }
+
+        .input-lettre:disabled {
+            background-color: #D32F2F;
+            color: white;
+            border-color: #B71C1C;
+        }
+
+        @media (max-width: 768px) {
+            .input-lettre {
+                width: 40px;
+                height: 40px;
+                font-size: 20px;
+            }
+        }
+
         .tentatives-jeu {
             margin-top: 20px;
         }
@@ -534,6 +573,9 @@
         <div class="proposition-section hidden" id="propositionSection">
             <h2>Proposition actuelle</h2>
             <div class="info-text" id="infoText"></div>
+            <div style="text-align: center; margin-bottom: 10px; color: #666; font-size: 14px; font-style: italic;">
+                Cliquez sur chaque lettre pour indiquer son état (bien placée, mal placée, absente)
+            </div>
             <div class="lettres-container" id="lettresContainer"></div>
             <div style="text-align: center;">
                 <button onclick="validerReponse()" id="validerBtn">Valider et continuer</button>
@@ -595,12 +637,8 @@
                 <div class="info-text" id="jeuInfo"></div>
                 
                 <div style="text-align: center; margin: 20px 0;">
-                    <input type="text" 
-                           id="inputMotJeu" 
-                           class="input-mot" 
-                           placeholder="Entrez votre mot"
-                           onkeypress="if(event.key==='Enter') soumettreMotJeu()">
-                    <br><br>
+                    <div class="input-lettres-container" id="inputLettresContainer"></div>
+                    <br>
                     <button onclick="soumettreMotJeu()">Valider</button>
                 </div>
 
@@ -1018,14 +1056,59 @@
 
             // Réinitialiser l'interface
             document.getElementById('tentativesJeu').innerHTML = '';
-            document.getElementById('inputMotJeu').value = '';
-            document.getElementById('inputMotJeu').maxLength = longueur;
             document.getElementById('jeuSection').classList.remove('hidden');
+            
+            // Créer les champs de saisie
+            creerChampsLettres(longueur);
             
             updateJeuInfo();
             showMessage('jeuMessage', `Partie démarrée ! Trouvez le mot de ${longueur} lettres commençant par ${motSecret[0]}`, 'success');
             
             console.log('Mot secret:', motSecret); // Pour debug
+        }
+
+        // Créer les champs de saisie pour les lettres
+        function creerChampsLettres(longueur) {
+            let container = document.getElementById('inputLettresContainer');
+            container.innerHTML = '';
+            
+            for (let i = 0; i < longueur; i++) {
+                let input = document.createElement('input');
+                input.type = 'text';
+                input.maxLength = 1;
+                input.className = 'input-lettre';
+                input.id = `lettre-${i}`;
+                
+                // Première lettre pré-remplie et désactivée
+                if (i === 0) {
+                    input.value = motSecret[0];
+                    input.disabled = true;
+                }
+                
+                // Navigation automatique entre les champs
+                input.addEventListener('input', function(e) {
+                    if (this.value.length === 1 && i < longueur - 1) {
+                        document.getElementById(`lettre-${i + 1}`).focus();
+                    }
+                });
+                
+                // Retour arrière
+                input.addEventListener('keydown', function(e) {
+                    if (e.key === 'Backspace' && this.value === '' && i > 0) {
+                        document.getElementById(`lettre-${i - 1}`).focus();
+                    }
+                    if (e.key === 'Enter') {
+                        soumettreMotJeu();
+                    }
+                });
+                
+                container.appendChild(input);
+            }
+            
+            // Focus sur le deuxième champ
+            if (longueur > 1) {
+                document.getElementById('lettre-1').focus();
+            }
         }
 
         // Mettre à jour les infos du jeu
@@ -1040,7 +1123,12 @@
                 return;
             }
 
-            let motPropose = document.getElementById('inputMotJeu').value.trim().toUpperCase();
+            // Récupérer le mot depuis les champs
+            let motPropose = '';
+            for (let i = 0; i < motSecret.length; i++) {
+                let input = document.getElementById(`lettre-${i}`);
+                motPropose += (input.value || '').toUpperCase();
+            }
             
             // Validations
             if (motPropose.length !== motSecret.length) {
@@ -1066,7 +1154,7 @@
             if (motPropose === motSecret) {
                 partieTerminee = true;
                 showMessage('jeuMessage', `🎉 Bravo ! Vous avez trouvé le mot "${motSecret}" en ${tentativesJeu} tentative(s) !`, 'success');
-                document.getElementById('inputMotJeu').disabled = true;
+                desactiverChampsLettres();
                 return;
             }
 
@@ -1074,14 +1162,29 @@
             if (tentativesJeu >= maxTentatives) {
                 partieTerminee = true;
                 showMessage('jeuMessage', `😞 Perdu ! Le mot était "${motSecret}"`, 'error');
-                document.getElementById('inputMotJeu').disabled = true;
+                desactiverChampsLettres();
                 return;
             }
 
             // Continuer
-            document.getElementById('inputMotJeu').value = '';
+            viderChampsLettres();
             updateJeuInfo();
             showMessage('jeuMessage', '', 'info');
+        }
+
+        // Vider les champs de lettres (sauf le premier)
+        function viderChampsLettres() {
+            for (let i = 1; i < motSecret.length; i++) {
+                document.getElementById(`lettre-${i}`).value = '';
+            }
+            document.getElementById('lettre-1').focus();
+        }
+
+        // Désactiver les champs de lettres
+        function desactiverChampsLettres() {
+            for (let i = 0; i < motSecret.length; i++) {
+                document.getElementById(`lettre-${i}`).disabled = true;
+            }
         }
 
         // Afficher une tentative
