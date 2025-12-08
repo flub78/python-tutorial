@@ -249,6 +249,26 @@
             border-color: #4A7FCA;
         }
 
+        .lettre-btn.edition {
+            background-color: white;
+            border-color: #4CAF50;
+            border-width: 3px;
+            box-shadow: 0 0 8px rgba(76, 175, 80, 0.5);
+        }
+
+        .lettre-btn input {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: transparent;
+            text-align: center;
+            font-size: inherit;
+            font-weight: inherit;
+            text-transform: uppercase;
+            color: inherit;
+            outline: none;
+        }
+
         .legende-section {
             border: 1px solid #ddd;
             border-radius: 6px;
@@ -648,6 +668,7 @@
         .ligne-tentative {
             display: flex;
             justify-content: center;
+            align-items: center;
             gap: 5px;
             margin: 8px 0;
             padding: 8px;
@@ -660,6 +681,46 @@
             padding: 10px;
             border: 2px solid #4CAF50;
             box-shadow: 0 0 10px rgba(76, 175, 80, 0.3);
+        }
+
+        .ligne-tentative.validee {
+            opacity: 0.8;
+        }
+
+        .numero-essai {
+            font-size: 16px;
+            font-weight: bold;
+            color: #4CAF50;
+            width: 50px;
+            flex-shrink: 0;
+            text-align: center;
+            margin-right: 5px;
+        }
+
+        .lettres-ligne {
+            display: flex;
+            gap: 5px;
+            justify-content: flex-start;
+        }
+
+        .info-candidats {
+            font-size: 12px;
+            color: #666;
+            min-width: 100px;
+            text-align: right;
+            margin-left: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .numero-essai {
+                font-size: 14px;
+                min-width: 30px;
+            }
+
+            .info-candidats {
+                font-size: 11px;
+                min-width: 70px;
+            }
         }
 
         .tentative-groupe {
@@ -765,19 +826,6 @@
             <div id="configMessage"></div>
         </div>
 
-        <!-- Section Proposition -->
-        <div class="proposition-section hidden" id="propositionSection">
-            <h2>Proposition actuelle</h2>
-            <div class="info-text" id="infoText"></div>
-            <div style="text-align: center; margin-bottom: 10px; color: #666; font-size: 14px; font-style: italic;">
-                Cliquez sur chaque lettre pour indiquer son état (bien placée, mal placée, absente)
-            </div>
-            <div class="lettres-container" id="lettresContainer"></div>
-            <div style="text-align: center;">
-                <button onclick="validerReponse()" id="validerBtn">Valider et continuer</button>
-            </div>
-        </div>
-
         <!-- Section Légende -->
         <div class="legende-section">
             <h2>Légende</h2>
@@ -795,22 +843,20 @@
                     <span>Absente (_)</span>
                 </div>
             </div>
+            <div class="legende-help">Cliquez sur chaque lettre pour changer son état</div>
         </div>
 
-        <!-- Section Historique -->
-        <div class="historique-section">
-            <h2>Historique des propositions</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Essai</th>
-                        <th>Mot</th>
-                        <th>Candidats restants</th>
-                    </tr>
-                </thead>
-                <tbody id="historiqueBody">
-                </tbody>
-            </table>
+        <!-- Section Grille de résolution -->
+        <div class="proposition-section hidden" id="propositionSection">
+            <h2>Résolution</h2>
+            <div class="info-text" id="infoText"></div>
+
+            <!-- Grille des tentatives -->
+            <div id="grilleResolution" style="margin: 20px auto; max-width: 600px;"></div>
+
+            <div style="text-align: center; margin-top: 15px;">
+                <button onclick="validerReponse()" id="validerBtn">Valider et continuer</button>
+            </div>
         </div>
         </div>
 
@@ -900,34 +946,63 @@
         <!-- Onglet Dictionnaire -->
         <div id="dico-tab" class="tab-content">
             <div class="config-section">
-                <h2>Filtres</h2>
+                <h2>Configuration</h2>
                 <div class="form-group">
-                    <label for="longueurDico">Longueur des mots (0 = toutes):</label>
-                    <input type="number" id="longueurDico" min="0" max="15" value="0" onchange="changerLongueurDico()" style="width: 80px; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+                    <label for="longueurDico">Longueur des mots:</label>
+                    <input type="number" id="longueurDico" min="3" max="15" value="6" style="width: 80px; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
                 </div>
-                <div id="filtreMotsContainer" style="display: none; margin: 15px 0;">
-                    <label style="font-weight: bold; margin-bottom: 10px; display: block;">Filtrer par lettres :</label>
-                    <p style="font-size: 14px; color: #666; margin-bottom: 10px;">Ex: A en seconde colonne sélectionne les mots dont la seconde lettre est un A</p>
-                    <div class="input-lettres-container" id="filtreLettresContainer"></div>
-                    <button onclick="reinitialiserFiltreDico()" style="margin-top: 10px;">Réinitialiser</button>
+                <div class="form-group">
+                    <button id="btnInitDico" onclick="toggleFiltreDico()">Initialiser</button>
                 </div>
-                <div style="margin: 15px 0;">
-                    <label style="font-weight: bold; margin-bottom: 10px; display: block;">Lettres interdites :</label>
-                    <p style="font-size: 14px; color: #666; margin-bottom: 10px;">Cochez les lettres qui ne doivent pas apparaître dans les mots</p>
-                    <div id="lettresInterdites" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(40px, 1fr)); gap: 5px; max-width: 600px;"></div>
+            </div>
+
+            <!-- Section Légende -->
+            <div class="legende-section">
+                <h2>Légende</h2>
+                <div class="legende-container">
+                    <div class="legende-item">
+                        <div class="legende-box" style="background-color: #D32F2F;"></div>
+                        <span>Bien placée</span>
+                    </div>
+                    <div class="legende-item">
+                        <div class="legende-box" style="background-color: #C9B458;"></div>
+                        <span>Mal placée (dans le mot)</span>
+                    </div>
+                    <div class="legende-item">
+                        <div class="legende-box" style="background-color: #5B8FDB;"></div>
+                        <span>Absente</span>
+                    </div>
+                    <div class="legende-item">
+                        <div class="legende-box" style="background-color: #e0e0e0;"></div>
+                        <span>Non définie</span>
+                    </div>
                 </div>
-                <div style="margin: 15px 0;">
-                    <label style="font-weight: bold; margin-bottom: 10px; display: block;">Lettres obligatoires :</label>
-                    <p style="font-size: 14px; color: #666; margin-bottom: 10px;">Cochez les lettres qui doivent apparaître dans les mots</p>
-                    <div id="lettresObligatoires" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(40px, 1fr)); gap: 5px; max-width: 600px;"></div>
+                <div class="legende-help">
+                    <strong>Interactions :</strong><br>
+                    • Simple clic : cycler les états (blanc → rouge → jaune → bleu → blanc)<br>
+                    • Double-clic : éditer la lettre
                 </div>
-                <div style="margin-top: 10px; font-weight: bold; color: #4CAF50;" id="compteurMots"></div>
+            </div>
+
+            <!-- Section Filtres par contraintes -->
+            <div class="config-section hidden" id="filtresDicoSection">
+                <h2>Contraintes sur les lettres</h2>
+                <p style="font-size: 14px; color: #666; margin-bottom: 15px;">
+                    Saisissez vos lettres, puis utilisez le simple clic pour cycler les états ou le double-clic pour modifier une lettre.
+                    Le bouton ➕ ajoute une nouvelle ligne de contraintes.
+                </p>
+
+                <!-- Grille des contraintes -->
+                <div id="grilleContraintes" style="margin: 20px auto; max-width: 600px;"></div>
             </div>
 
             <div class="config-section">
-                <h2>Mots du dictionnaire</h2>
-                <textarea id="affichageDico" 
-                          readonly 
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <h2 style="margin: 0;">Mots du dictionnaire</h2>
+                    <div style="font-weight: bold; color: #4CAF50;" id="compteurMots"></div>
+                </div>
+                <textarea id="affichageDico"
+                          readonly
                           style="width: 100%; height: 400px; font-family: monospace; font-size: 14px; padding: 10px; border: 1px solid #ccc; border-radius: 4px; resize: vertical;">
                 </textarea>
             </div>
@@ -950,6 +1025,7 @@
         let reponseActuelle = [];
         let currentLettreIndex = -1;
         let lettresConnues = {}; // Pour mémoriser les lettres bien placées
+        let historiqueTentatives = []; // Historique des tentatives validées
 
         // Variables globales pour le jeu
         let motSecret = '';
@@ -959,10 +1035,8 @@
 
         // Variables globales pour le dictionnaire
         let longueurDicoSelectionnee = 0;
-        let filtresDico = [];
         let longueurMaxDico = 0;
-        let lettresInterdites = new Set();
-        let lettresObligatoires = new Set();
+        let contraintesDico = []; // Liste des contraintes: {lettres: ['A', '', 'B', ...], etats: ['=', '', '?', ...]}
 
         // Gestion des onglets
         function switchTab(tabName) {
@@ -1001,11 +1075,6 @@
 
         // Essayer de charger le dictionnaire par défaut au démarrage
         window.addEventListener('DOMContentLoaded', function() {
-            // Créer les checkboxes pour les lettres interdites
-            creerCheckboxesLettresInterdites();
-            // Créer les checkboxes pour les lettres obligatoires
-            creerCheckboxesLettresObligatoires();
-            
             fetch('dico.txt')
                 .then(response => {
                     if (!response.ok) {
@@ -1173,7 +1242,7 @@
             // Réinitialiser
             essai = 0;
             lettresConnues = {}; // Réinitialiser les lettres connues
-            document.getElementById('historiqueBody').innerHTML = '';
+            historiqueTentatives = []; // Réinitialiser l'historique
             document.getElementById('propositionSection').classList.remove('hidden');
 
             proposerMot();
@@ -1198,30 +1267,92 @@
                 }
             }
 
-            document.getElementById('infoText').textContent = 
+            document.getElementById('infoText').textContent =
                 `Essai ${essai} - ${candidats.length} candidat(s) restant(s)`;
 
-            // Afficher les lettres
-            let container = document.getElementById('lettresContainer');
-            container.innerHTML = '';
+            // Reconstruire toute la grille
+            afficherGrilleResolution();
+        }
 
-            for (let i = 0; i < motActuel.length; i++) {
+        // Afficher la grille complète avec historique + ligne active
+        function afficherGrilleResolution() {
+            let grille = document.getElementById('grilleResolution');
+            grille.innerHTML = '';
+
+            // Afficher l'historique des tentatives validées
+            historiqueTentatives.forEach((tentative, index) => {
+                let ligneDiv = creerLigneTentative(
+                    tentative.essai,
+                    tentative.mot,
+                    tentative.reponse,
+                    tentative.candidatsRestants,
+                    false // pas active
+                );
+                ligneDiv.classList.add('validee');
+                grille.appendChild(ligneDiv);
+            });
+
+            // Afficher la ligne active (proposition actuelle)
+            let ligneActive = creerLigneTentative(
+                essai,
+                motActuel,
+                reponseActuelle,
+                candidats.length,
+                true // active
+            );
+            ligneActive.classList.add('active');
+            grille.appendChild(ligneActive);
+        }
+
+        // Créer une ligne de tentative
+        function creerLigneTentative(numEssai, mot, reponse, nbCandidats, estActive) {
+            let ligneDiv = document.createElement('div');
+            ligneDiv.className = 'ligne-tentative';
+
+            // Numéro de l'essai
+            let numeroDiv = document.createElement('div');
+            numeroDiv.className = 'numero-essai';
+            numeroDiv.textContent = `#${numEssai}`;
+            ligneDiv.appendChild(numeroDiv);
+
+            // Conteneur des lettres
+            let lettresDiv = document.createElement('div');
+            lettresDiv.className = 'lettres-ligne';
+
+            for (let i = 0; i < mot.length; i++) {
                 let btn = document.createElement('button');
                 btn.className = 'lettre-btn';
-                btn.textContent = motActuel[i];
-                btn.onclick = () => cycleEtat(i);
-                btn.oncontextmenu = (e) => {
-                    e.preventDefault();
-                    afficherMenu(e, i);
-                };
-                
-                // Appliquer la couleur par défaut si lettre connue
-                if (reponseActuelle[i] === '=') {
+                btn.textContent = mot[i];
+
+                // Appliquer la couleur selon la réponse
+                if (reponse[i] === '=') {
                     btn.classList.add('bien-placee');
+                } else if (reponse[i] === '?') {
+                    btn.classList.add('mal-placee');
+                } else if (reponse[i] === '_') {
+                    btn.classList.add('absente');
                 }
-                
-                container.appendChild(btn);
+
+                // Si c'est la ligne active, permettre l'interaction
+                if (estActive) {
+                    btn.onclick = () => cycleEtat(i);
+                    btn.oncontextmenu = (e) => {
+                        e.preventDefault();
+                        afficherMenu(e, i);
+                    };
+                }
+
+                lettresDiv.appendChild(btn);
             }
+            ligneDiv.appendChild(lettresDiv);
+
+            // Info candidats restants
+            let infoDiv = document.createElement('div');
+            infoDiv.className = 'info-candidats';
+            infoDiv.textContent = `${nbCandidats} mot${nbCandidats > 1 ? 's' : ''}`;
+            ligneDiv.appendChild(infoDiv);
+
+            return ligneDiv;
         }
 
         // Changer l'état d'une lettre (cycle)
@@ -1235,17 +1366,9 @@
         // Définir l'état d'une lettre
         function setEtat(index, etat) {
             reponseActuelle[index] = etat;
-            
-            let btn = document.getElementById('lettresContainer').children[index];
-            btn.className = 'lettre-btn';
-            
-            if (etat === '=') {
-                btn.classList.add('bien-placee');
-            } else if (etat === '?') {
-                btn.classList.add('mal-placee');
-            } else if (etat === '_') {
-                btn.classList.add('absente');
-            }
+
+            // Rafraîchir l'affichage de la grille
+            afficherGrilleResolution();
 
             document.getElementById('contextMenu').classList.add('hidden');
         }
@@ -1275,31 +1398,19 @@
                 }
             }
 
-            // Créer l'affichage du mot avec les couleurs
-            let motColore = '';
-            for (let i = 0; i < motActuel.length; i++) {
-                let classe = '';
-                if (reponseActuelle[i] === '=') {
-                    classe = 'bien-placee';
-                } else if (reponseActuelle[i] === '?') {
-                    classe = 'mal-placee';
-                } else {
-                    classe = 'absente';
-                }
-                motColore += `<span class="lettre-historique ${classe}">${motActuel[i]}</span>`;
-            }
-
             // Ajouter à l'historique
-            let tbody = document.getElementById('historiqueBody');
-            let row = tbody.insertRow();
-            row.insertCell(0).textContent = essai;
-            row.insertCell(1).innerHTML = motColore;
-            row.insertCell(2).textContent = candidats.length;
+            historiqueTentatives.push({
+                essai: essai,
+                mot: motActuel,
+                reponse: [...reponseActuelle],
+                candidatsRestants: candidats.length
+            });
 
             // Vérifier si gagné
             if (reponse === '='.repeat(motActuel.length)) {
                 showMessage('configMessage', `🎉 Mot trouvé en ${essai} essai(s): ${motActuel}`, 'success');
-                document.getElementById('propositionSection').classList.add('hidden');
+                // Afficher la grille finale sans ligne active
+                afficherGrilleFinale();
                 return;
             }
 
@@ -1308,12 +1419,30 @@
 
             if (candidats.length === 0) {
                 showMessage('configMessage', 'Aucun mot ne correspond. Vérifiez vos réponses.', 'error');
-                document.getElementById('propositionSection').classList.add('hidden');
+                afficherGrilleFinale();
                 return;
             }
 
             // Proposer le mot suivant
             proposerMot();
+        }
+
+        // Afficher la grille finale (sans ligne active)
+        function afficherGrilleFinale() {
+            let grille = document.getElementById('grilleResolution');
+            grille.innerHTML = '';
+
+            historiqueTentatives.forEach((tentative) => {
+                let ligneDiv = creerLigneTentative(
+                    tentative.essai,
+                    tentative.mot,
+                    tentative.reponse,
+                    tentative.candidatsRestants,
+                    false
+                );
+                ligneDiv.classList.add('validee');
+                grille.appendChild(ligneDiv);
+            });
         }
 
         // Afficher un message
@@ -1630,180 +1759,474 @@
             console.log(`Longueur maximale du dictionnaire: ${longueurMaxDico}`);
         }
 
-        // Fonction pour changer la longueur du dictionnaire à afficher
-        function changerLongueurDico() {
-            let select = document.getElementById('longueurDico');
-            longueurDicoSelectionnee = parseInt(select.value);
-            
-            let filtresContainer = document.getElementById('filtreLettresContainer');
-            let filtresSection = document.getElementById('filtreMotsContainer');
-            filtresContainer.innerHTML = '';
-            
+        // Initialiser le filtre du dictionnaire
+        function toggleFiltreDico() {
+            // Si les filtres sont actifs, réinitialiser
             if (longueurDicoSelectionnee > 0) {
-                filtresSection.style.display = 'block';
-                for (let i = 0; i < longueurDicoSelectionnee; i++) {
-                    let input = document.createElement('input');
-                    input.type = 'text';
-                    input.maxLength = 1;
-                    input.className = 'filtre-position';
-                    input.placeholder = '';
-                    input.dataset.position = i;
-                    
-                    input.addEventListener('input', function() {
-                        let val = this.value.toUpperCase();
-                        this.value = val;
-                        if (val) {
-                            filtresDico[i] = val;
-                        } else {
-                            filtresDico[i] = '';
-                        }
-                        afficherDictionnaire();
-                    });
-                    
-                    filtresContainer.appendChild(input);
-                }
-                filtresDico = new Array(longueurDicoSelectionnee).fill('');
+                reinitialiserFiltreDico();
             } else {
-                filtresSection.style.display = 'none';
-                filtresDico = [];
+                initialiserFiltreDico();
             }
-            
-            afficherDictionnaire();
         }
 
-        // Fonction pour créer les checkboxes des lettres interdites
-        function creerCheckboxesLettresInterdites() {
-            const container = document.getElementById('lettresInterdites');
-            const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-            
-            for (let lettre of alphabet) {
-                const label = document.createElement('label');
-                label.style.cssText = 'display: flex; align-items: center; cursor: pointer; padding: 5px; border: 1px solid #ccc; border-radius: 4px; background-color: #f9f9f9;';
-                
-                const checkbox = document.createElement('input');
-                checkbox.type = 'checkbox';
-                checkbox.value = lettre;
-                checkbox.style.marginRight = '5px';
-                checkbox.addEventListener('change', function() {
-                    if (this.checked) {
-                        lettresInterdites.add(lettre);
-                    } else {
-                        lettresInterdites.delete(lettre);
-                    }
-                    afficherDictionnaire();
+        function initialiserFiltreDico() {
+            let longueur = parseInt(document.getElementById('longueurDico').value);
+
+            if (!longueur || longueur < 3 || longueur > 15) {
+                alert('Veuillez entrer une longueur valide (3-15)');
+                return;
+            }
+
+            longueurDicoSelectionnee = longueur;
+            contraintesDico = [];
+
+            // Créer automatiquement la première ligne de contrainte
+            contraintesDico.push({
+                lettres: new Array(longueurDicoSelectionnee).fill(''),
+                etats: new Array(longueurDicoSelectionnee).fill('')
+            });
+
+            document.getElementById('filtresDicoSection').classList.remove('hidden');
+            document.getElementById('btnInitDico').textContent = 'Réinitialiser';
+            afficherGrilleContraintes();
+            filtrerDictionnaire();
+        }
+
+        // Afficher la grille des contraintes
+        function afficherGrilleContraintes() {
+            let grille = document.getElementById('grilleContraintes');
+            grille.innerHTML = '';
+
+            contraintesDico.forEach((contrainte, index) => {
+                let ligneDiv = creerLigneContrainte(index, contrainte);
+                grille.appendChild(ligneDiv);
+            });
+        }
+
+        // Créer une ligne de contrainte
+        function creerLigneContrainte(index, contrainte) {
+            let ligneDiv = document.createElement('div');
+            ligneDiv.className = 'ligne-tentative';
+            ligneDiv.style.marginBottom = '10px';
+
+            // Numéro de la contrainte
+            let numeroDiv = document.createElement('div');
+            numeroDiv.className = 'numero-essai';
+            numeroDiv.textContent = `#${index + 1}`;
+            ligneDiv.appendChild(numeroDiv);
+
+            // Conteneur des lettres
+            let lettresDiv = document.createElement('div');
+            lettresDiv.className = 'lettres-ligne';
+
+            for (let i = 0; i < longueurDicoSelectionnee; i++) {
+                let btn = document.createElement('button');
+                btn.className = 'lettre-btn';
+                btn.dataset.ligneIndex = index;
+                btn.dataset.caseIndex = i;
+
+                // Afficher la lettre ou un espace vide
+                if (contrainte.lettres[i]) {
+                    btn.textContent = contrainte.lettres[i];
+                }
+
+                // Appliquer la couleur selon l'état
+                if (contrainte.etats[i] === '=') {
+                    btn.classList.add('bien-placee');
+                } else if (contrainte.etats[i] === '?') {
+                    btn.classList.add('mal-placee');
+                } else if (contrainte.etats[i] === '_') {
+                    btn.classList.add('absente');
+                }
+
+                // Gérer les clicks (cycler les couleurs)
+                btn.addEventListener('click', (e) => {
+                    cyclerCouleurContrainte(index, i, e);
                 });
-                
-                const span = document.createElement('span');
-                span.textContent = lettre;
-                span.style.fontWeight = 'bold';
-                
-                label.appendChild(checkbox);
-                label.appendChild(span);
-                container.appendChild(label);
-            }
-        }
 
-        // Fonction pour créer les checkboxes des lettres obligatoires
-        function creerCheckboxesLettresObligatoires() {
-            const container = document.getElementById('lettresObligatoires');
-            const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-            
-            for (let lettre of alphabet) {
-                const label = document.createElement('label');
-                label.style.cssText = 'display: flex; align-items: center; cursor: pointer; padding: 5px; border: 1px solid #ccc; border-radius: 4px; background-color: #f9f9f9;';
-                
-                const checkbox = document.createElement('input');
-                checkbox.type = 'checkbox';
-                checkbox.value = lettre;
-                checkbox.style.marginRight = '5px';
-                checkbox.addEventListener('change', function() {
-                    if (this.checked) {
-                        lettresObligatoires.add(lettre);
-                    } else {
-                        lettresObligatoires.delete(lettre);
-                    }
-                    afficherDictionnaire();
+                // Gérer les double-clicks (éditer la lettre)
+                btn.addEventListener('dblclick', (e) => {
+                    e.preventDefault();
+                    cyclerCaseContrainte(index, i, e);
                 });
-                
-                const span = document.createElement('span');
-                span.textContent = lettre;
-                span.style.fontWeight = 'bold';
-                
-                label.appendChild(checkbox);
-                label.appendChild(span);
-                container.appendChild(label);
+
+                lettresDiv.appendChild(btn);
+            }
+            ligneDiv.appendChild(lettresDiv);
+
+            // Conteneur des boutons d'action avec largeur fixe pour l'alignement
+            let actionsDiv = document.createElement('div');
+            actionsDiv.style.cssText = 'display: flex; gap: 5px; margin-left: 10px; width: 100px; flex-shrink: 0;';
+
+            // Bouton ajouter (seulement sur la dernière ligne)
+            if (index === contraintesDico.length - 1) {
+                let btnAjouter = document.createElement('button');
+                btnAjouter.innerHTML = '&#xff0b;'; // Full-width plus sign
+                btnAjouter.title = 'Ajouter une ligne';
+                btnAjouter.style.cssText = 'background-color: #4CAF50; color: white; padding: 8px 12px; border: none; border-radius: 4px; cursor: pointer; width: 45px; font-size: 20px; font-weight: bold;';
+                btnAjouter.onclick = () => ajouterLigneContrainte();
+                actionsDiv.appendChild(btnAjouter);
+            }
+
+            // Bouton supprimer (seulement s'il y a plus d'une ligne)
+            if (contraintesDico.length > 1) {
+                let btnSupprimer = document.createElement('button');
+                btnSupprimer.innerHTML = '&#x1f5d1;'; // Wastebasket icon
+                btnSupprimer.title = 'Supprimer cette ligne';
+                btnSupprimer.style.cssText = 'background-color: #f44336; color: white; padding: 8px 12px; border: none; border-radius: 4px; cursor: pointer; width: 45px; font-size: 16px;';
+                btnSupprimer.onclick = () => supprimerContrainte(index);
+                actionsDiv.appendChild(btnSupprimer);
+            }
+
+            ligneDiv.appendChild(actionsDiv);
+
+            return ligneDiv;
+        }
+
+        // Variable pour suivre la case en cours d'édition
+        let caseEnEdition = null;
+
+        // Éditer une case de contrainte (double-clic)
+        function cyclerCaseContrainte(indexLigne, indexCase, event) {
+            // Si une autre case est en édition, la finaliser d'abord
+            if (caseEnEdition && (caseEnEdition.indexLigne !== indexLigne || caseEnEdition.indexCase !== indexCase)) {
+                annulerEditionCase();
+                return; // Attendre le prochain click pour cette case
+            }
+
+            let contrainte = contraintesDico[indexLigne];
+            let btn = event.currentTarget;
+
+            // Double-clic = toujours passer en mode édition
+            activerEditionCase(indexLigne, indexCase, btn);
+        }
+
+        // Cycler les couleurs (simple clic)
+        function cyclerCouleurContrainte(indexLigne, indexCase, event) {
+            let contrainte = contraintesDico[indexLigne];
+            let btn = event.currentTarget;
+
+            // Si la case n'a pas de lettre, passer en mode édition
+            if (!contrainte.lettres[indexCase]) {
+                activerEditionCase(indexLigne, indexCase, btn);
+                return;
+            }
+
+            // Si la case est blanche (neutre), passer en rouge
+            if (!contrainte.etats[indexCase]) {
+                contrainte.etats[indexCase] = '=';
+                btn.classList.add('bien-placee');
+                filtrerDictionnaire();
+            } else {
+                // Sinon, cycler l'état: '=' (rouge) -> '?' (jaune) -> '_' (bleu) -> '' (blanc)
+                let etats = ['=', '?', '_'];
+                let etatActuel = contrainte.etats[indexCase];
+                let indexEtat = etats.indexOf(etatActuel);
+
+                if (indexEtat === etats.length - 1) {
+                    // Après bleu, retour en blanc (neutre)
+                    contrainte.etats[indexCase] = '';
+                    btn.classList.remove('bien-placee', 'mal-placee', 'absente');
+                    filtrerDictionnaire();
+                } else {
+                    // Passer à l'état suivant
+                    let nouvelEtat = etats[indexEtat + 1];
+                    contrainte.etats[indexCase] = nouvelEtat;
+
+                    // Mettre à jour l'apparence du bouton directement sans reconstruire la grille
+                    btn.classList.remove('bien-placee', 'mal-placee', 'absente');
+                    if (nouvelEtat === '=') {
+                        btn.classList.add('bien-placee');
+                    } else if (nouvelEtat === '?') {
+                        btn.classList.add('mal-placee');
+                    } else if (nouvelEtat === '_') {
+                        btn.classList.add('absente');
+                    }
+
+                    // Filtrer le dictionnaire sans reconstruire la grille
+                    filtrerDictionnaire();
+                }
             }
         }
 
-        // Fonction pour afficher le dictionnaire (filtré ou complet)
-        function afficherDictionnaire() {
+        // Activer le mode édition pour une case
+        function activerEditionCase(indexLigne, indexCase, btn) {
+            // Désactiver l'édition précédente si elle existe
+            if (caseEnEdition) {
+                annulerEditionCase();
+            }
+
+            caseEnEdition = { indexLigne, indexCase };
+
+            // Changer l'apparence du bouton
+            btn.classList.add('edition');
+            btn.innerHTML = '';
+
+            // Créer un input pour saisir la lettre
+            let input = document.createElement('input');
+            input.type = 'text';
+            input.maxLength = 1;
+            input.value = contraintesDico[indexLigne].lettres[indexCase] || '';
+            input.style.cssText = 'width: 100%; height: 100%; border: none; background: transparent; text-align: center; font-size: inherit; font-weight: inherit; text-transform: uppercase; outline: none;';
+
+            btn.appendChild(input);
+
+            // Focus automatique et sélection du texte pour faciliter le remplacement
+            // Doit être appelé APRÈS l'ajout au DOM
+            input.focus();
+            input.select();
+
+            // Gérer la saisie
+            input.addEventListener('input', (e) => {
+                let val = e.target.value.toUpperCase();
+                if (val && (val < 'A' || val > 'Z')) {
+                    e.target.value = '';
+                    return;
+                }
+                e.target.value = val;
+
+                // Si une lettre a été saisie, la sauvegarder et passer à la case suivante
+                if (val) {
+                    contraintesDico[indexLigne].lettres[indexCase] = val;
+                    contraintesDico[indexLigne].etats[indexCase] = ''; // État neutre (blanc) par défaut
+                    caseEnEdition = null;
+
+                    // Passer à la case suivante si elle existe
+                    if (indexCase < longueurDicoSelectionnee - 1) {
+                        afficherGrilleContraintes();
+                        // Pas de filtrage pour l'état neutre
+                        // Activer automatiquement la case suivante
+                        setTimeout(() => {
+                            let grilleContraintes = document.getElementById('grilleContraintes');
+                            let lignes = grilleContraintes.querySelectorAll('.ligne-tentative');
+                            if (lignes[indexLigne]) {
+                                let boutons = lignes[indexLigne].querySelectorAll('.lettre-btn');
+                                if (boutons[indexCase + 1]) {
+                                    boutons[indexCase + 1].click();
+                                }
+                            }
+                        }, 10);
+                    } else {
+                        // Dernière case de la ligne, juste reconstruire
+                        afficherGrilleContraintes();
+                    }
+                }
+            });
+
+            // Variable pour éviter les doubles validations
+            let validationEnCours = false;
+
+            // Gérer la validation (Enter ou perte de focus)
+            let valider = () => {
+                if (validationEnCours) return;
+                validationEnCours = true;
+
+                let lettre = input.value.trim().toUpperCase();
+                if (lettre) {
+                    contraintesDico[indexLigne].lettres[indexCase] = lettre;
+                    contraintesDico[indexLigne].etats[indexCase] = ''; // État neutre (blanc) par défaut
+                } else {
+                    // Si l'input est vide, effacer la case complètement
+                    contraintesDico[indexLigne].lettres[indexCase] = '';
+                    contraintesDico[indexLigne].etats[indexCase] = '';
+                }
+                caseEnEdition = null;
+
+                // Reconstruire la grille pour sortir du mode édition
+                afficherGrilleContraintes();
+                // Pas de filtrage pour l'état neutre
+            };
+
+            input.addEventListener('blur', valider);
+            input.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    valider();
+                }
+            });
+
+            // Gérer la touche Backspace/Delete pour effacer
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Backspace' || e.key === 'Delete') {
+                    // Laisser l'input gérer la suppression normalement
+                    // Si l'input devient vide, la case sera effacée lors de la validation
+                }
+            });
+        }
+
+        // Annuler le mode édition
+        function annulerEditionCase() {
+            if (caseEnEdition) {
+                // Sauvegarder la valeur actuelle de l'input s'il existe
+                let input = document.querySelector('.lettre-btn.edition input');
+                if (input) {
+                    let lettre = input.value.trim().toUpperCase();
+                    if (lettre) {
+                        contraintesDico[caseEnEdition.indexLigne].lettres[caseEnEdition.indexCase] = lettre;
+                        contraintesDico[caseEnEdition.indexLigne].etats[caseEnEdition.indexCase] = '=';
+                    } else {
+                        contraintesDico[caseEnEdition.indexLigne].lettres[caseEnEdition.indexCase] = '';
+                        contraintesDico[caseEnEdition.indexLigne].etats[caseEnEdition.indexCase] = '';
+                    }
+                }
+                caseEnEdition = null;
+                afficherGrilleContraintes();
+                filtrerDictionnaire();
+            }
+        }
+
+        // Ajouter une ligne de contrainte
+        function ajouterLigneContrainte() {
+            contraintesDico.push({
+                lettres: new Array(longueurDicoSelectionnee).fill(''),
+                etats: new Array(longueurDicoSelectionnee).fill('')
+            });
+
+            afficherGrilleContraintes();
+        }
+
+        // Supprimer une contrainte
+        function supprimerContrainte(index) {
+            contraintesDico.splice(index, 1);
+            afficherGrilleContraintes();
+            filtrerDictionnaire();
+        }
+
+        // Filtrer le dictionnaire selon les contraintes
+        function filtrerDictionnaire() {
             if (dictionnaire.length === 0) {
-                document.getElementById('affichageDico').value = 'Dictionnaire non chargé. Utilisez le bouton ci-dessus pour charger un fichier.';
+                document.getElementById('affichageDico').value = 'Dictionnaire non chargé.';
                 document.getElementById('compteurMots').textContent = '';
                 return;
             }
-            
+
             let motsAffiches = dictionnaire;
-            
-            // Filtrer par lettres interdites
-            if (lettresInterdites.size > 0) {
-                motsAffiches = motsAffiches.filter(mot => {
-                    for (let lettre of lettresInterdites) {
-                        if (mot.includes(lettre)) {
-                            return false;
-                        }
-                    }
-                    return true;
-                });
-            }
-            
-            // Filtrer par lettres obligatoires
-            if (lettresObligatoires.size > 0) {
-                motsAffiches = motsAffiches.filter(mot => {
-                    for (let lettre of lettresObligatoires) {
-                        if (!mot.includes(lettre)) {
-                            return false;
-                        }
-                    }
-                    return true;
-                });
-            }
-            
-            // Filtrer par longueur si une longueur est sélectionnée
+
+            // Filtrer par longueur
             if (longueurDicoSelectionnee > 0) {
                 motsAffiches = motsAffiches.filter(mot => mot.length === longueurDicoSelectionnee);
-                
-                // Filtrer par positions de lettres si des filtres sont définis
-                for (let i = 0; i < filtresDico.length; i++) {
-                    if (filtresDico[i]) {
-                        motsAffiches = motsAffiches.filter(mot => mot[i] === filtresDico[i]);
-                    }
-                }
             }
-            
+
+            // Appliquer TOUTES les contraintes de TOUTES les lignes
+            // Chaque mot doit satisfaire TOUTES les contraintes
+            motsAffiches = motsAffiches.filter(mot => {
+                // Le mot doit respecter chaque ligne de contrainte
+                return contraintesDico.every(contrainte => {
+                    return motRespectedContrainte(mot, contrainte);
+                });
+            });
+
+            console.log(`Résultat final du filtrage: ${motsAffiches.length} mots`);
             document.getElementById('affichageDico').value = motsAffiches.join('\n');
             document.getElementById('compteurMots').textContent = `Nombre de mots : ${motsAffiches.length}`;
         }
 
+        // Vérifier si un mot respecte une contrainte
+        function motRespectedContrainte(mot, contrainte) {
+            // Vérifier si la contrainte a au moins une lettre avec un état actif (pas vide et pas neutre)
+            let aContrainteActive = false;
+            for (let i = 0; i < contrainte.lettres.length; i++) {
+                if (contrainte.lettres[i] && contrainte.etats[i]) {
+                    aContrainteActive = true;
+                    break;
+                }
+            }
+
+            // Si aucune contrainte active, la ligne est neutre et accepte tous les mots
+            if (!aContrainteActive) {
+                console.log('Contrainte neutre détectée - accepte tous les mots');
+                return true;
+            }
+
+            // Debug: afficher les contraintes actives
+            let contraintesActives = [];
+            for (let i = 0; i < contrainte.lettres.length; i++) {
+                if (contrainte.lettres[i] && contrainte.etats[i]) {
+                    contraintesActives.push(`${contrainte.lettres[i]}(${contrainte.etats[i]})`);
+                }
+            }
+            if (contraintesActives.length > 0) {
+                console.log('Contraintes actives:', contraintesActives.join(', '));
+            }
+
+            let lettresMalPlacees = [];
+            let lettresAbsentesGlobales = new Set(); // Lettres qui n'apparaissent nulle part
+
+            // Collecter toutes les positions où chaque lettre apparaît dans la contrainte
+            let lettresPositions = {};
+            for (let i = 0; i < contrainte.lettres.length; i++) {
+                let lettre = contrainte.lettres[i];
+                let etat = contrainte.etats[i];
+                if (!lettre) continue;
+
+                if (!lettresPositions[lettre]) {
+                    lettresPositions[lettre] = [];
+                }
+                lettresPositions[lettre].push({ position: i, etat: etat });
+            }
+
+            // Vérifier chaque lettre de la contrainte
+            for (let i = 0; i < contrainte.lettres.length; i++) {
+                let lettre = contrainte.lettres[i];
+                let etat = contrainte.etats[i];
+
+                if (!lettre) continue; // Case vide
+                if (!etat) continue; // État neutre (blanc) - pas de contrainte
+
+                if (etat === '=') {
+                    // Lettre bien placée : doit être à cette position exacte
+                    if (mot[i] !== lettre) {
+                        return false;
+                    }
+                } else if (etat === '_') {
+                    // Lettre absente À CETTE POSITION
+                    // Vérifier si cette lettre n'a QUE des marquages absents (pas de = ou ?)
+                    let tousEtatsLettre = lettresPositions[lettre];
+                    let aEtatNonAbsent = tousEtatsLettre.some(info => info.etat !== '_' && info.etat !== '');
+
+                    if (!aEtatNonAbsent) {
+                        // Si toutes les occurrences sont absentes, la lettre ne doit pas être dans le mot
+                        if (mot.includes(lettre)) {
+                            return false;
+                        }
+                    } else {
+                        // Sinon, juste vérifier que la lettre n'est pas à cette position
+                        if (mot[i] === lettre) {
+                            return false;
+                        }
+                    }
+                } else if (etat === '?') {
+                    // Lettre mal placée : doit être dans le mot mais pas à cette position
+                    lettresMalPlacees.push({ lettre, position: i });
+                }
+            }
+
+            // Vérifier les lettres mal placées
+            for (let info of lettresMalPlacees) {
+                if (!mot.includes(info.lettre)) {
+                    return false; // La lettre doit être dans le mot
+                }
+                if (mot[info.position] === info.lettre) {
+                    return false; // La lettre ne doit pas être à cette position
+                }
+            }
+
+            return true;
+        }
+
+        // Afficher le dictionnaire (pour le chargement initial)
+        function afficherDictionnaire() {
+            filtrerDictionnaire();
+        }
+
         // Fonction pour réinitialiser les filtres du dictionnaire
         function reinitialiserFiltreDico() {
-            document.getElementById('longueurDico').value = '0';
+            document.getElementById('longueurDico').value = '6';
             longueurDicoSelectionnee = 0;
-            filtresDico = [];
-            document.getElementById('filtreLettresContainer').innerHTML = '';
-            
-            // Décocher toutes les lettres interdites
-            lettresInterdites.clear();
-            document.querySelectorAll('#lettresInterdites input[type="checkbox"]').forEach(cb => {
-                cb.checked = false;
-            });
-            
-            // Décocher toutes les lettres obligatoires
-            lettresObligatoires.clear();
-            document.querySelectorAll('#lettresObligatoires input[type="checkbox"]').forEach(cb => {
-                cb.checked = false;
-            });
-            
+            contraintesDico = [];
+            document.getElementById('filtresDicoSection').classList.add('hidden');
+            document.getElementById('grilleContraintes').innerHTML = '';
+            document.getElementById('btnInitDico').textContent = 'Initialiser';
             afficherDictionnaire();
         }
     </script>
