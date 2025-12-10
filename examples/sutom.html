@@ -605,6 +605,13 @@
             border-color: #B8A040;
         }
 
+        .touche-clavier.absente {
+            background-color: #5B8FDB;
+            color: white;
+            border-color: #4A7FCA;
+            opacity: 0.8;
+        }
+
         @media (max-width: 768px) {
             .touche-clavier {
                 min-width: 30px;
@@ -877,7 +884,10 @@
             <div class="proposition-section hidden" id="jeuSection">
                 <h2>Tentez de deviner le mot</h2>
                 <div class="info-text" id="jeuInfo"></div>
-                
+
+                <!-- Input invisible pour clavier mobile -->
+                <input type="text" id="mobileInput" style="position: absolute; opacity: 0; pointer-events: none;" autocomplete="off" autocorrect="off" autocapitalize="characters">
+
                 <!-- Grille des 6 tentatives -->
                 <div id="grilleJeu" style="margin: 20px auto; max-width: 400px;"></div>
 
@@ -1487,46 +1497,57 @@
             
             // Créer la grille de 6 lignes
             creerGrilleJeu(longueur);
-            
+
             updateJeuInfo();
             showMessage('jeuMessage', `Partie démarrée ! Trouvez le mot de ${longueur} lettres commençant par ${motSecret[0]}`, 'success');
-            
+
+            // Donner le focus à l'input mobile pour déclencher le clavier virtuel
+            setTimeout(() => {
+                let mobileInput = document.getElementById('mobileInput');
+                if (mobileInput) {
+                    mobileInput.focus();
+                }
+            }, 100);
+
             console.log('Mot secret:', motSecret); // Pour debug
         }
 
-        // Créer la grille de jeu avec 6 lignes
+        // Créer la grille de jeu - n'afficher que les lignes jusqu'à la tentative actuelle
         function creerGrilleJeu(longueur) {
             let grille = document.getElementById('grilleJeu');
             grille.innerHTML = '';
-            
-            for (let ligne = 0; ligne < maxTentatives; ligne++) {
+
+            // Afficher seulement les lignes précédentes + la ligne active
+            let nbLignesAfficher = tentativesJeu + 1;
+
+            for (let ligne = 0; ligne < nbLignesAfficher; ligne++) {
                 let ligneDiv = document.createElement('div');
                 ligneDiv.className = 'ligne-tentative';
                 ligneDiv.id = `ligne-${ligne}`;
-                if (ligne === 0) {
+                if (ligne === tentativesJeu) {
                     ligneDiv.classList.add('active');
                 }
-                
+
                 for (let i = 0; i < longueur; i++) {
                     let caseDiv = document.createElement('div');
                     caseDiv.className = 'case-lettre';
                     caseDiv.id = `case-${ligne}-${i}`;
-                    
-                    // Première lettre de la première ligne pré-remplie
-                    if (ligne === 0 && i === 0) {
+
+                    // Première lettre de chaque ligne pré-remplie
+                    if (i === 0) {
                         caseDiv.textContent = motSecret[0];
                         caseDiv.classList.add('remplie');
                         caseDiv.style.backgroundColor = '#D32F2F';
                         caseDiv.style.color = 'white';
                         caseDiv.style.borderColor = '#B71C1C';
                     }
-                    
+
                     ligneDiv.appendChild(caseDiv);
                 }
-                
+
                 grille.appendChild(ligneDiv);
             }
-            
+
             // Ajouter le gestionnaire d'événements pour le clavier physique
             ajouterEcouteurClavierJeu();
         }
@@ -1537,6 +1558,44 @@
             document.removeEventListener('keydown', gererToucheClavierJeu);
             // Ajouter le nouvel écouteur
             document.addEventListener('keydown', gererToucheClavierJeu);
+
+            // Ajouter l'écouteur pour l'input mobile
+            let mobileInput = document.getElementById('mobileInput');
+            if (mobileInput) {
+                mobileInput.addEventListener('input', gererInputMobile);
+                mobileInput.addEventListener('keydown', gererToucheMobile);
+            }
+        }
+
+        // Gérer l'input mobile
+        function gererInputMobile(e) {
+            let input = e.target;
+            let valeur = input.value.toUpperCase();
+
+            if (valeur && valeur.length > 0) {
+                let dernierCaractere = valeur[valeur.length - 1];
+                if (dernierCaractere >= 'A' && dernierCaractere <= 'Z') {
+                    ajouterLettreJeu(dernierCaractere);
+                }
+            }
+
+            // Vider l'input pour permettre la saisie suivante
+            input.value = '';
+        }
+
+        // Gérer les touches spéciales sur mobile
+        function gererToucheMobile(e) {
+            if (partieTerminee) {
+                return;
+            }
+
+            if (e.key === 'Backspace' || e.key === 'Delete') {
+                e.preventDefault();
+                effacerLettreJeu();
+            } else if (e.key === 'Enter') {
+                e.preventDefault();
+                soumettreMotJeu();
+            }
         }
 
         // Gérer les touches du clavier physique
@@ -1546,8 +1605,13 @@
                 return;
             }
 
-            // Ignorer si on est dans un champ de saisie
-            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+            // Ignorer si on est dans un champ de saisie (sauf l'input mobile qui est géré séparément)
+            if ((e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') && e.target.id !== 'mobileInput') {
+                return;
+            }
+
+            // Si c'est l'input mobile, ne rien faire ici (géré par gererInputMobile)
+            if (e.target.id === 'mobileInput') {
                 return;
             }
 
@@ -1592,16 +1656,19 @@
             // Validations
             if (motPropose.length !== motSecret.length) {
                 showMessage('jeuMessage', `Le mot doit contenir exactement ${motSecret.length} lettres`, 'error');
+                refocusMobileInput();
                 return;
             }
 
             if (motPropose[0] !== motSecret[0]) {
                 showMessage('jeuMessage', `Le mot doit commencer par ${motSecret[0]}`, 'error');
+                refocusMobileInput();
                 return;
             }
 
             if (!dictionnaire.includes(motPropose)) {
                 showMessage('jeuMessage', 'Ce mot n\'est pas dans le dictionnaire', 'error');
+                refocusMobileInput();
                 return;
             }
 
@@ -1629,20 +1696,44 @@
                 return;
             }
 
-            // Activer la ligne suivante
+            // Désactiver la ligne précédente
             document.getElementById(`ligne-${tentativesJeu - 1}`).classList.remove('active');
-            document.getElementById(`ligne-${tentativesJeu}`).classList.add('active');
-            
-            // Pré-remplir la première lettre de la nouvelle ligne
-            let premiereCaseNouvelleLigne = document.getElementById(`case-${tentativesJeu}-0`);
-            premiereCaseNouvelleLigne.textContent = motSecret[0];
-            premiereCaseNouvelleLigne.classList.add('remplie');
-            premiereCaseNouvelleLigne.style.backgroundColor = '#D32F2F';
-            premiereCaseNouvelleLigne.style.color = 'white';
-            premiereCaseNouvelleLigne.style.borderColor = '#B71C1C';
-            
+
+            // Créer et ajouter la nouvelle ligne
+            ajouterNouvelleLigneJeu();
+
             updateJeuInfo();
             showMessage('jeuMessage', '', 'info');
+
+            // Remettre le focus sur l'input mobile pour continuer à jouer
+            refocusMobileInput();
+        }
+
+        // Ajouter une nouvelle ligne de jeu
+        function ajouterNouvelleLigneJeu() {
+            let grille = document.getElementById('grilleJeu');
+            let ligneDiv = document.createElement('div');
+            ligneDiv.className = 'ligne-tentative active';
+            ligneDiv.id = `ligne-${tentativesJeu}`;
+
+            for (let i = 0; i < motSecret.length; i++) {
+                let caseDiv = document.createElement('div');
+                caseDiv.className = 'case-lettre';
+                caseDiv.id = `case-${tentativesJeu}-${i}`;
+
+                // Première lettre pré-remplie
+                if (i === 0) {
+                    caseDiv.textContent = motSecret[0];
+                    caseDiv.classList.add('remplie');
+                    caseDiv.style.backgroundColor = '#D32F2F';
+                    caseDiv.style.color = 'white';
+                    caseDiv.style.borderColor = '#B71C1C';
+                }
+
+                ligneDiv.appendChild(caseDiv);
+            }
+
+            grille.appendChild(ligneDiv);
         }
 
         // Colorer une ligne selon le pattern
@@ -1690,8 +1781,22 @@
                 if (!caseDiv.textContent || caseDiv.textContent === '') {
                     caseDiv.textContent = lettre;
                     caseDiv.classList.add('remplie');
+
+                    // Remettre le focus sur l'input mobile
+                    refocusMobileInput();
                     return;
                 }
+            }
+
+            // Remettre le focus même si toutes les cases sont remplies
+            refocusMobileInput();
+        }
+
+        // Fonction pour remettre le focus sur l'input mobile
+        function refocusMobileInput() {
+            let mobileInput = document.getElementById('mobileInput');
+            if (mobileInput) {
+                setTimeout(() => mobileInput.focus(), 10);
             }
         }
 
@@ -1707,9 +1812,15 @@
                 if (caseDiv.textContent && caseDiv.textContent !== '') {
                     caseDiv.textContent = '';
                     caseDiv.classList.remove('remplie');
+
+                    // Remettre le focus sur l'input mobile
+                    refocusMobileInput();
                     return;
                 }
             }
+
+            // Remettre le focus même si rien n'a été effacé
+            refocusMobileInput();
         }
 
         // Fonction pour mettre à jour l'état des touches du clavier
@@ -1717,18 +1828,18 @@
             for (let i = 0; i < motPropose.length; i++) {
                 let lettre = motPropose[i];
                 let bouton = document.querySelector(`.touche-clavier[onclick="ajouterLettreJeu('${lettre}')"]`);
-                
+
                 if (bouton) {
                     if (pattern[i] === '=') {
                         // Bien placée - rouge (priorité la plus haute)
-                        bouton.classList.remove('mal-placee');
+                        bouton.classList.remove('mal-placee', 'absente');
                         bouton.classList.add('bien-placee');
                     } else if (pattern[i] === '?' && !bouton.classList.contains('bien-placee')) {
                         // Mal placée - jaune (seulement si pas déjà bien placée)
                         bouton.classList.add('mal-placee');
                     } else if (pattern[i] === '_' && !bouton.classList.contains('bien-placee') && !bouton.classList.contains('mal-placee')) {
-                        // Absente - désactiver
-                        bouton.disabled = true;
+                        // Absente - marquer visuellement mais garder activé
+                        bouton.classList.add('absente');
                     }
                 }
             }
@@ -1738,7 +1849,7 @@
         function reinitialiserClavier() {
             document.querySelectorAll('.touche-clavier').forEach(bouton => {
                 bouton.disabled = false;
-                bouton.classList.remove('bien-placee', 'mal-placee');
+                bouton.classList.remove('bien-placee', 'mal-placee', 'absente');
             });
         }
 
