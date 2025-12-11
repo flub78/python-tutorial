@@ -789,7 +789,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>Sutom pour les marcheurs fatigués</h1>
+        <h1>Sutom pour les marcheurs fatigués <span style="font-size: 0.5em; color: #666; font-weight: normal;">v1.0</span></h1>
 
         <!-- Section commune de chargement du dictionnaire -->
         <div class="config-section" id="fichierDicoSection">
@@ -1269,7 +1269,10 @@
             motActuel = meilleurMot(candidats);
             reponseActuelle = Array(motActuel.length).fill('_');
 
-            // Pré-remplir avec les lettres connues
+            // La première lettre est toujours bien placée (connue dès le départ)
+            reponseActuelle[0] = '=';
+
+            // Pré-remplir avec les autres lettres connues
             for (let pos in lettresConnues) {
                 let index = parseInt(pos);
                 if (motActuel[index] === lettresConnues[pos]) {
@@ -1367,6 +1370,11 @@
 
         // Changer l'état d'une lettre (cycle)
         function cycleEtat(index) {
+            // La première lettre ne peut pas être modifiée (toujours bien placée)
+            if (index === 0) {
+                return;
+            }
+            
             let etats = ['_', '?', '='];
             let etatActuel = reponseActuelle[index];
             let nouvelEtat = etats[(etats.indexOf(etatActuel) + 1) % 3];
@@ -1375,6 +1383,11 @@
 
         // Définir l'état d'une lettre
         function setEtat(index, etat) {
+            // La première lettre ne peut pas être modifiée (toujours bien placée)
+            if (index === 0) {
+                return;
+            }
+            
             reponseActuelle[index] = etat;
 
             // Rafraîchir l'affichage de la grille
